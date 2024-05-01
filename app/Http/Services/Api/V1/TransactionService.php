@@ -52,7 +52,19 @@ class TransactionService extends BaseResponse
     {
         DB::beginTransaction();
         try {
-            $inventory = Inventory::findOrFail($data['inventory_id']);
+            $inventory = Inventory::find($data['inventory_id']);
+            if (! $inventory) {
+                return $this->responseError('Inventory not found.', 404);
+            }
+
+            if ($inventory->quantity <= 0) {
+                return $this->responseError('Out of stock.', 400);
+            }
+
+            if ($inventory->quantity < $data['quantity']) {
+                return $this->responseError('Stock not enough.', 400);
+            }
+
             $data['price'] = $inventory->price;
             $data['total'] = $data['price'] * $data['quantity'];
             $data['code'] = 'TRX-'.$data['inventory_id'].'-'.$data['type']->value.'-'.date('YmdHis');
@@ -133,6 +145,12 @@ class TransactionService extends BaseResponse
 
             if ($transaction->type != TransactionType::OUT) {
                 return $this->responseError('Transaction type not out.', 400);
+            }
+
+            $inventory = $transaction->inventory;
+            $diffQuantity = $data['quantity'] - $transaction->quantity;
+            if ($inventory->quantity < $diffQuantity) {
+                return $this->responseError('Stock not enough.', 400);
             }
 
             $prevTotalAmount = $transaction->total;
