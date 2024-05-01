@@ -1,0 +1,50 @@
+version: '3'
+services:
+    nginx:
+        platform: linux/arm64/v8
+        container_name: nginx-one-dashboard
+        image: nginx:alpine3.18-slim
+        command: [ "nginx", "-g", "daemon off;" ]
+        depends_on:
+            - app
+        links:
+            - app
+        working_dir: /var/www/html
+        volumes:
+            - ./docker/nginx/asset/:/etc/nginx/conf.d/
+            - ./docker/nginx/log:/var/log/nginx/:rw
+            - ./:/var/www/html:rw
+        env_file:
+            - ./docker/.env
+        ports:
+            - "${DOCKER_NGINX_PORT:-8080}:80"
+        logging:
+            options:
+                max-size: "1m"
+                max-file: "3"
+    app:
+        container_name: app-one-dashboard
+        build: ./docker/php
+        working_dir: /var/www/html
+        volumes:
+            - ./:/var/www/html:rw
+    db:
+        platform: linux/amd64
+        container_name: db-one-dashboard
+        image: "mysql:8.3.0"
+        volumes:
+            - "./dbdata:/var/lib/mysql/"
+        env_file:
+            - ./docker/.env
+        ports:
+            - "${DOCKER_DB_PORT:-3307}:3306"
+    phpmyadmin:
+        platform: "linux/amd64"
+        container_name: phpmyadmin-one-dashboard
+        image: "phpmyadmin:5.2.1"
+        env_file:
+            - ./docker/.env
+        ports:
+            - "${DOCKER_DB_PANEL_PORT:-8082}:80"
+        volumes:
+            - /sessions
