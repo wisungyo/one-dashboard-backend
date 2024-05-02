@@ -30,7 +30,7 @@ One Dashboard RESTful API to manage inventories.
 
 - Copy `env.example` to `.env` and set it with your own credentials
 - Copy `/docker/env.example` to `/docker/.env` and set it with your own credentials
-- Set **DB_HOST=db** and other DB Credentials in `.env` using MYSQL Credentials in `/docker/.env`
+- Set **DB_HOST=db** (or **DB_HOST=host.docker.internal**) and other DB Credentials in `.env` using MYSQL Credentials in `/docker/.env`
 - Run `make build`
 - Run `docker compose exec app composer install`
 - Run `docker compose exec app php artisan migrate:refresh --seed`
