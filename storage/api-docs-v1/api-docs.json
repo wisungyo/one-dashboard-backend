@@ -641,11 +641,15 @@
                             "application/json": {
                                 "schema": {
                                     "properties": {
-                                        "data": {
-                                            "type": "object",
-                                            "example": []
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
                                         },
-                                        "pagination": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Get prediction value successfully"
+                                        },
+                                        "data": {
                                             "type": "object",
                                             "example": []
                                         }
@@ -655,8 +659,8 @@
                             }
                         }
                     },
-                    "400": {
-                        "description": "Get prediction value failed",
+                    "500": {
+                        "description": "Internal server error",
                         "content": {
                             "application/json": {
                                 "schema": {

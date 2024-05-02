@@ -39,14 +39,15 @@ class PredictionController extends Controller
      *
      *          @OA\JsonContent(
      *
+     *              @OA\Property(property="status", type="boolean", example=true),
+     *              @OA\Property(property="message", type="string", example="Get prediction value successfully"),
      *              @OA\Property(property="data", type="object", example={}),
-     *              @OA\Property(property="pagination", type="object", example={}),
      *          )
      *      ),
      *
      *      @OA\Response(
-     *          response=400,
-     *          description="Get prediction value failed",
+     *          response=500,
+     *          description="Internal server error",
      *
      *          @OA\JsonContent(
      *

@@ -277,7 +277,7 @@ class TransactionTest extends TestCase
                     'image',
                 ],
             ]);
-        
+
         sleep(1); // Sleep for 1 second to make sure the code is different
 
         $transaction = Transaction::find($response['data']['id']);
@@ -361,7 +361,7 @@ class TransactionTest extends TestCase
                     'image',
                 ],
             ]);
-        
+
         sleep(1); // Sleep for 1 second to make sure the code is different
 
         $transaction = Transaction::find($response['data']['id']);
