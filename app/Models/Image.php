@@ -4,8 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Storage;
@@ -23,7 +21,6 @@ class Image extends Model
         'path',
         'height',
         'width',
-        'parent_id',
         'attachable_type',
         'attachable_id',
     ];
@@ -34,22 +31,6 @@ class Image extends Model
     public function attachable(): MorphTo
     {
         return $this->morphTo();
-    }
-
-    /**
-     * Relation to parent.
-     */
-    public function parent(): BelongsTo
-    {
-        return $this->belongsTo(Image::class);
-    }
-
-    /**
-     * Get all children
-     */
-    public function childrens(): HasMany
-    {
-        return $this->hasMany(Image::class, 'parent_id');
     }
 
     /**

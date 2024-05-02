@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('expenses', function (Blueprint $table) {
             $table->id();
-            $table->integer('year');
-            $table->integer('month');
+            $table->tinyInteger('year');
+            $table->tinyInteger('month');
             $table->float('amount', 10, 2);
             $table->foreignId('created_by')->constrained('users');
             $table->timestamps();

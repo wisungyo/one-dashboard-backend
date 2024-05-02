@@ -13,7 +13,6 @@ return new class extends Migration
     {
         Schema::create('images', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('parent_id')->nullable();
             $table->string('type')->nullable();
             $table->integer('size');
             $table->string('mime_type', 100);
