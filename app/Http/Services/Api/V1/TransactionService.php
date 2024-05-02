@@ -180,7 +180,7 @@ class TransactionService extends BaseResponse
                 'inventory_id' => $transaction->inventory_id,
                 'type' => TransactionType::OUT,
                 'price' => $diffTotalAmount,
-                'quantity' => $data['quantity'],
+                'quantity' => $diffQuantity,
                 'note' => 'Update transaction',
             ];
             $trxResp = $this->store($trxData);
