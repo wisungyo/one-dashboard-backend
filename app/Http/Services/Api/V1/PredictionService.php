@@ -98,7 +98,7 @@ class PredictionService extends BaseResponse
             $firstTimestamp = strtotime('-'.self::MONTH_PERIODE - 1 .' month', $initTimestamp);
 
             // Sum transaction quantity per month
-            $transactions = Transaction::selectRaw('SUM(quantity) as quantity, SUM(total) as amount, YEAR(created_at) as year, MONTH(created_at) as month')
+            $transactions = Transaction::selectRaw('SUM(quantity) as '.(self::KEY_TOTAL).', SUM(total) as amount, YEAR(created_at) as year, MONTH(created_at) as month')
                 ->where('type', TransactionType::OUT)
                 ->where('created_at', '>=', date('Y-m-d', $firstTimestamp))
                 ->where('created_at', '<=', date('Y-m-t', $initTimestamp))
