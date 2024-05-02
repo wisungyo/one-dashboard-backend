@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('code')->unique();
             $table->enum('type', TransactionType::toArray())->default(TransactionType::IN);
             $table->float('price', 10, 2);
-            $table->integer('quantity');
+            $table->tinyInteger('quantity');
             $table->float('total', 10, 2);
             $table->text('note')->nullable();
             $table->foreignId('created_by')->constrained('users');
