@@ -95,6 +95,10 @@ class TransactionService extends BaseResponse
                     return $this->responseError($expense['message'], $expense['statusCode'], $expense['data']['errors']);
                 }
             } elseif ($data['type'] == TransactionType::OUT) {
+                // Deduct inventory quantity
+                $inventory->quantity -= $data['quantity'];
+                $inventory->save();
+
                 // Add Income
                 $income = IncomeService::calculate($transaction, IncomeType::ADD);
                 if (! $income['status']) {
