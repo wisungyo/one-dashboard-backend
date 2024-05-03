@@ -92,14 +92,14 @@ class PredictionService extends BaseResponse
             $data = [];
 
             // Do exponential smoothing calculation
-            $initTimestamp = strtotime("$year-$month-01");
-            $firstTimestamp = strtotime('-'.self::MONTH_PERIODE - 1 .' month', $initTimestamp);
+            $latestTimestamp = strtotime("$year-$month-01");
+            $firstTimestamp = strtotime('-'.self::MONTH_PERIODE - 1 .' month', $latestTimestamp);
 
             // Sum transaction quantity per month
             $transactions = Transaction::selectRaw('SUM(total_quantity) as '.(self::KEY_TOTAL).', SUM(total_price) as amount, YEAR(created_at) as year, MONTH(created_at) as month')
                 ->where('type', TransactionType::OUT)
                 ->where('created_at', '>=', date('Y-m-d', $firstTimestamp))
-                ->where('created_at', '<=', date('Y-m-t', $initTimestamp))
+                ->where('created_at', '<=', date('Y-m-t', $latestTimestamp))
                 ->groupBy('year', 'month')
                 ->orderBy('year', 'asc')
                 ->orderBy('month', 'asc')
@@ -131,7 +131,7 @@ class PredictionService extends BaseResponse
                 'month' => $month,
                 'month_periode' => self::MONTH_PERIODE,
                 'alpha' => self::ALPHA,
-                'init_timestamp' => date('Y-m-d', $initTimestamp),
+                'latest_timestamp' => date('Y-m-d', $latestTimestamp),
                 'first_timestamp' => date('Y-m-d', $firstTimestamp),
                 'prediction_value' => $predictionValue,
                 'mape_value' => $this->mape($actual, $predictions),
