@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\Api\V1\Transaction;
+namespace App\Http\Requests\Api\V1\Category;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class UpdateRequest extends FormRequest
+class StoreRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,8 +22,8 @@ class UpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'quantity' => ['required', 'integer'],
-            'image' => ['nullable', 'image', 'mimes:'.getImageTypesValidation(), 'max:'.getMaxImageSize()],
+            'name' => ['required', 'string', 'max:100'],
+            'description' => ['nullable', 'string', 'max:255'],
         ];
     }
 }

@@ -18,6 +18,7 @@ class UserSeeder extends Seeder
         User::create([
             'name' => 'Super Admin',
             'email' => 'super@onedashboard.com',
+            'phone_number' => '+62818181xxxxx',
             'password' => bcrypt($password),
         ]);
     }

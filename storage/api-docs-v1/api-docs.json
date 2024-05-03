@@ -164,6 +164,408 @@
                 ]
             }
         },
+        "/api/v1/categories": {
+            "get": {
+                "tags": [
+                    "Category"
+                ],
+                "summary": "Get list categories ",
+                "description": "Endpoint to get list categories ",
+                "operationId": "e225c2b7eb5daf7fb16e00f4f07ff030",
+                "parameters": [
+                    {
+                        "name": "name",
+                        "in": "query",
+                        "description": "name"
+                    },
+                    {
+                        "name": "description",
+                        "in": "query",
+                        "description": "Description"
+                    },
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "description": "1 for Ascending -1 for Descending"
+                    },
+                    {
+                        "name": "sort_by",
+                        "in": "query",
+                        "description": "Field to sort"
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Limit (Default 10)"
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Num Of Page"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Get list categories successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "example": []
+                                        },
+                                        "pagination": {
+                                            "type": "object",
+                                            "example": []
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Get list categories failed",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Get list categories failed"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "token": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Category"
+                ],
+                "summary": "Create a new category",
+                "description": "Create a new category",
+                "operationId": "dd76b8d73b7ea8b4951f03d7c0904c92",
+                "requestBody": {
+                    "description": "Data that needed to create a new category",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Elektronik"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Elektronik"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Create a new category successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Create a new category successfully"
+                                        },
+                                        "data": {
+                                            "type": "object",
+                                            "example": []
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Wrong credentials response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "The given data was invalid."
+                                        },
+                                        "errors": {
+                                            "type": "object",
+                                            "example": []
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Create a new category failed"
+                    }
+                },
+                "security": [
+                    {
+                        "token": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/categories/{id}": {
+            "get": {
+                "tags": [
+                    "Category"
+                ],
+                "summary": "Get detail category",
+                "description": "Endpoint to get detail category",
+                "operationId": "9c4934d1b68a6d4440ec72cfc8ae7074",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Get category successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Get category successfully"
+                                        },
+                                        "data": {
+                                            "type": "object",
+                                            "example": []
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Category not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Category not found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "token": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Category"
+                ],
+                "summary": "Update category",
+                "description": "Endpoint to update category",
+                "operationId": "988e8695bc991d7f8e40131db5ba7a76",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID",
+                        "required": true
+                    }
+                ],
+                "requestBody": {
+                    "description": "Data that needed to update category",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Elektronik"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Elektronik"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Update category successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Update category successfully"
+                                        },
+                                        "data": {
+                                            "type": "object",
+                                            "example": []
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Update category failed",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Update category failed"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "token": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Category"
+                ],
+                "summary": "Delete category",
+                "description": "Endpoint to delete category",
+                "operationId": "37196d259228d2274dd9dbef8b00e547",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Delete category successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Delete category successfully"
+                                        },
+                                        "data": {
+                                            "type": "object",
+                                            "example": []
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Category not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Category not found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "token": []
+                    }
+                ]
+            }
+        },
         "/api/v1/inventories": {
             "get": {
                 "tags": [
@@ -173,6 +575,11 @@
                 "description": "Endpoint to get list inventories ",
                 "operationId": "425df31f832a0357248de9f6276e234f",
                 "parameters": [
+                    {
+                        "name": "category_id",
+                        "in": "query",
+                        "description": "Categoy ID"
+                    },
                     {
                         "name": "code",
                         "in": "query",
@@ -279,6 +686,7 @@
                         "multipart/form-data": {
                             "schema": {
                                 "required": [
+                                    "category_id",
                                     "code",
                                     "name",
                                     "price",
@@ -286,6 +694,10 @@
                                     "image"
                                 ],
                                 "properties": {
+                                    "category_id": {
+                                        "type": "number",
+                                        "example": 1
+                                    },
                                     "code": {
                                         "type": "string",
                                         "example": "INV1X"
@@ -328,7 +740,7 @@
                                         },
                                         "message": {
                                             "type": "string",
-                                            "example": "Register customer successfully"
+                                            "example": "Create a new inventory successfully"
                                         },
                                         "data": {
                                             "type": "object",
@@ -459,10 +871,17 @@
                         "multipart/form-data": {
                             "schema": {
                                 "required": [
+                                    "category_id",
                                     "code",
-                                    "name"
+                                    "name",
+                                    "price",
+                                    "quantity"
                                 ],
                                 "properties": {
+                                    "category_id": {
+                                        "type": "number",
+                                        "example": 1
+                                    },
                                     "code": {
                                         "type": "string",
                                         "example": "INV1X"
@@ -773,6 +1192,16 @@
                                         "type": "email",
                                         "example": "super@onedashboard.com"
                                     },
+                                    "phone_number": {
+                                        "description": "Phone Number",
+                                        "type": "string",
+                                        "example": "+62818181xxxxx"
+                                    },
+                                    "bio": {
+                                        "description": "Bio",
+                                        "type": "string",
+                                        "example": "Lorem ipsum"
+                                    },
                                     "password": {
                                         "description": "Password (for update password)",
                                         "type": "string",
@@ -995,6 +1424,11 @@
                 "operationId": "0ffe6bf7980513c9d322e1ba4d400ff2",
                 "parameters": [
                     {
+                        "name": "category_id",
+                        "in": "query",
+                        "description": "Category ID"
+                    },
+                    {
                         "name": "inventory_id",
                         "in": "query",
                         "description": "Inventory ID"
@@ -1007,22 +1441,42 @@
                     {
                         "name": "type",
                         "in": "query",
-                        "description": "Type ('in' or 'out')"
+                        "description": "Type ('IN' or 'OUT')"
                     },
                     {
-                        "name": "price",
+                        "name": "total_item",
                         "in": "query",
-                        "description": "Price"
+                        "description": "Total Item"
                     },
                     {
-                        "name": "quantity",
+                        "name": "total_quantity",
                         "in": "query",
-                        "description": "Quantity"
+                        "description": "Total Quantity"
                     },
                     {
-                        "name": "total",
+                        "name": "total_price",
                         "in": "query",
-                        "description": "Total"
+                        "description": "Total Price"
+                    },
+                    {
+                        "name": "customer_name",
+                        "in": "query",
+                        "description": "Customer Name"
+                    },
+                    {
+                        "name": "customer_phone",
+                        "in": "query",
+                        "description": "Customer Phone"
+                    },
+                    {
+                        "name": "customer_address",
+                        "in": "query",
+                        "description": "Customer Address"
+                    },
+                    {
+                        "name": "note",
+                        "in": "query",
+                        "description": "Note"
                     },
                     {
                         "name": "sort",
@@ -1101,24 +1555,59 @@
                 "description": "Create a new transaction",
                 "operationId": "b0ee1d82e907b370897f7c2adde8a664",
                 "requestBody": {
+                    "description": "Data that needed to create a new transaction",
+                    "required": true,
                     "content": {
-                        "multipart/form-data": {
+                        "application/json": {
                             "schema": {
                                 "required": [
-                                    "inventory_id",
-                                    "quantity"
+                                    "note",
+                                    "items"
                                 ],
                                 "properties": {
-                                    "inventory_id": {
-                                        "type": "number",
-                                        "example": 1
+                                    "customer_name": {
+                                        "type": "string",
+                                        "example": "John Doe"
                                     },
-                                    "quantity": {
-                                        "type": "number",
-                                        "example": 2
+                                    "customer_phone": {
+                                        "type": "string",
+                                        "example": "08123456789"
                                     },
-                                    "image": {
-                                        "type": "file"
+                                    "customer_address": {
+                                        "type": "string",
+                                        "example": "Jl. Raya No. 1"
+                                    },
+                                    "note": {
+                                        "type": "string",
+                                        "example": "Buy some items"
+                                    },
+                                    "items": {
+                                        "description": "Array of transaction items",
+                                        "type": "array",
+                                        "items": {
+                                            "required": [
+                                                "inventory_id",
+                                                "quantity"
+                                            ],
+                                            "properties": {
+                                                "inventory_id": {
+                                                    "description": "Inventory ID",
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "quantity": {
+                                                    "description": "Quantity of the item",
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "note": {
+                                                    "description": "Note of the item",
+                                                    "type": "string",
+                                                    "example": "Buy some items"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
                                     }
                                 },
                                 "type": "object"
@@ -1139,7 +1628,7 @@
                                         },
                                         "message": {
                                             "type": "string",
-                                            "example": "Register customer successfully"
+                                            "example": "Register a new transaction successfully"
                                         },
                                         "data": {
                                             "type": "object",
@@ -1212,161 +1701,6 @@
                                         "message": {
                                             "type": "string",
                                             "example": "Get transaction successfully"
-                                        },
-                                        "data": {
-                                            "type": "object",
-                                            "example": []
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Transaction not found",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "status": {
-                                            "type": "boolean",
-                                            "example": false
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Transaction not found"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "token": []
-                    }
-                ]
-            },
-            "post": {
-                "tags": [
-                    "Transaction"
-                ],
-                "summary": "Update transaction",
-                "description": "Endpoint to update transaction",
-                "operationId": "6db7117e26449053503307cd844c4a11",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "description": "ID",
-                        "required": true
-                    }
-                ],
-                "requestBody": {
-                    "content": {
-                        "multipart/form-data": {
-                            "schema": {
-                                "required": [
-                                    "quantity"
-                                ],
-                                "properties": {
-                                    "quantity": {
-                                        "type": "number",
-                                        "example": 15
-                                    },
-                                    "image": {
-                                        "type": "file"
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Update transaction successfully",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "status": {
-                                            "type": "boolean",
-                                            "example": true
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Update transaction successfully"
-                                        },
-                                        "data": {
-                                            "type": "object",
-                                            "example": []
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Update transaction failed",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "status": {
-                                            "type": "boolean",
-                                            "example": false
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Update transaction failed"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "token": []
-                    }
-                ]
-            },
-            "delete": {
-                "tags": [
-                    "Transaction"
-                ],
-                "summary": "Delete transaction",
-                "description": "Endpoint to delete transaction",
-                "operationId": "db289b0d1fea21825cc577ddeb7f2157",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "description": "ID",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Delete transaction successfully",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "status": {
-                                            "type": "boolean",
-                                            "example": true
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Delete transaction successfully"
                                         },
                                         "data": {
                                             "type": "object",

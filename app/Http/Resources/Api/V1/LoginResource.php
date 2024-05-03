@@ -16,9 +16,7 @@ class LoginResource extends JsonResource
     {
         return [
             'token' => $this->createToken('authToken')->plainTextToken,
-            'user_id' => $this->id,
-            'name' => $this->name,
-            'email' => $this->email,
+            'user' => new UserResource($this->resource),
         ];
     }
 }

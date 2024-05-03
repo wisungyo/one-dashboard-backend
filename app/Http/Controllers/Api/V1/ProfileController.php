@@ -78,6 +78,8 @@ class ProfileController extends Controller
      *
      *                   @OA\Property(property="name", type="string", description="Name", example="my name is supeeer"),
      *                   @OA\Property(property="email", type="email", description="Email", example="super@onedashboard.com"),
+     *                   @OA\Property(property="phone_number", type="string", description="Phone Number", example="+62818181xxxxx"),
+     *                   @OA\Property(property="bio", type="string", description="Bio", example="Lorem ipsum"),
      *                   @OA\Property(property="password", type="string", description="Password (for update password)", format="password", example=null),
      *                   @OA\Property(property="avatar", type="file", description="Avatar"),
      *               )

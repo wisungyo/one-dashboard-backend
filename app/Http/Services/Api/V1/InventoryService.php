@@ -4,6 +4,7 @@ namespace App\Http\Services\Api\V1;
 
 use App\Enums\ExpenseType;
 use App\Enums\TransactionType;
+use App\Http\Filters\Api\V1\ByCategoryId;
 use App\Http\Filters\Api\V1\ByCode;
 use App\Http\Filters\Api\V1\ByDescription;
 use App\Http\Filters\Api\V1\ByName;
@@ -26,6 +27,7 @@ class InventoryService extends BaseResponse
         try {
             $query = Inventory::query();
             $piplines = [
+                ByCategoryId::class,
                 ByCode::class,
                 ByName::class,
                 ByDescription::class,
@@ -67,13 +69,19 @@ class InventoryService extends BaseResponse
 
             // Add in transaction
             $trxData = [
-                'inventory_id' => $inventory->id,
                 'type' => TransactionType::IN,
-                'price' => $inventory->price,
-                'quantity' => $inventory->quantity,
+                'total_price' => $inventory->price,
+                'total_quantity' => $inventory->quantity,
                 'note' => 'Create inventory', // 'Add inventory
                 'created_by' => auth()->id(),
             ];
+            $trxData['items'] = [];
+            array_push($trxData['items'], [
+                'inventory_id' => $inventory->id,
+                'price' => $inventory->price,
+                'quantity' => $inventory->quantity,
+                'total' => $inventory->price * $inventory->quantity,
+            ]);
             $trxResp = TransactionService::store($trxData);
             if (isset($trxResp['status']) && ! $trxResp['status']) {
                 DB::rollBack();
@@ -115,9 +123,13 @@ class InventoryService extends BaseResponse
             if (! $inventory) {
                 return $this->responseError('Inventory not found.', 404);
             }
-            $prevTotalAmount = $inventory->price * $inventory->quantity;
+            $prevQuantity = $inventory->quantity;
+            $prevPrice = $inventory->price;
+            $prevTotalAmount = $prevQuantity * $prevPrice;
             $inventory->update($data);
-            $diffTotalAmount = ($inventory->price * $inventory->quantity) - $prevTotalAmount;
+            $diffQuantity = $data['quantity'] - $prevQuantity;
+            $diffPrice = $data['price'] - $prevPrice;
+            $diffTotalAmount = ($data['price'] * $data['quantity']) - $prevTotalAmount;
 
             // Update image
             if (isset($data['image'])) {
@@ -135,12 +147,17 @@ class InventoryService extends BaseResponse
 
             // Add in transaction to deduct the previous total amount
             $trxData = [
-                'inventory_id' => $inventory->id,
                 'type' => TransactionType::IN,
-                'price' => $diffTotalAmount,
-                'quantity' => $data['quantity'],
-                'note' => 'Update inventory',
+                'total_price' => $diffTotalAmount,
+                'total_quantity' => $diffQuantity,
+                'note' => 'Update inventory', // 'Update inventory
                 'created_by' => auth()->id(),
+            ];
+            $trxItemData[] = [
+                'inventory_id' => $inventory->id,
+                'price' => $diffPrice,
+                'quantity' => $diffQuantity,
+                'total' => $diffTotalAmount,
             ];
             $trxResp = TransactionService::store($trxData);
             if (isset($trxResp['status']) && ! $trxResp['status']) {

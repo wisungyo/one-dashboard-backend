@@ -6,6 +6,7 @@ use App\Enums\TransactionType;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -16,12 +17,14 @@ class Transaction extends Model
     use SoftDeletes;
 
     protected $fillable = [
-        'inventory_id',
         'code', // auto generate
         'type',
-        'price',
-        'quantity',
-        'total',
+        'total_item',
+        'total_quantity',
+        'total_price',
+        'customer_name',
+        'customer_phone',
+        'customer_address',
         'note',
         'created_by',
     ];
@@ -36,9 +39,9 @@ class Transaction extends Model
         ];
     }
 
-    public function inventory(): BelongsTo
+    public function items(): HasMany
     {
-        return $this->belongsTo(Inventory::class);
+        return $this->hasMany(TransactionItem::class);
     }
 
     public function author(): BelongsTo

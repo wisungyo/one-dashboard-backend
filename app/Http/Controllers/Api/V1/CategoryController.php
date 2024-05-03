@@ -3,35 +3,25 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Cores\ApiResponse;
-use App\Http\Requests\Api\V1\Inventory\StoreRequest;
-use App\Http\Requests\Api\V1\Inventory\UpdateRequest;
-use Facades\App\Http\Services\Api\V1\InventoryService;
+use App\Http\Requests\Api\V1\Category\StoreRequest;
+use App\Http\Requests\Api\V1\Category\UpdateRequest;
+use Facades\App\Http\Services\Api\V1\CategoryService;
 use Illuminate\Http\Request;
 
-class InventoryController extends Controller
+class CategoryController extends Controller
 {
     use ApiResponse;
 
     /**
      * @OA\Get(
-     *       path="/api/v1/inventories",
-     *       summary="Get list inventories ",
-     *       description="Endpoint to get list inventories ",
-     *       tags={"Inventory"},
+     *       path="/api/v1/categories",
+     *       summary="Get list categories ",
+     *       description="Endpoint to get list categories ",
+     *       tags={"Category"},
      *       security={
      *           {"token": {}}
      *       },
      *
-     *       @OA\Parameter(
-     *           name="category_id",
-     *           in="query",
-     *           description="Categoy ID"
-     *       ),
-     *       @OA\Parameter(
-     *           name="code",
-     *           in="query",
-     *           description="Code"
-     *       ),
      *       @OA\Parameter(
      *           name="name",
      *           in="query",
@@ -41,16 +31,6 @@ class InventoryController extends Controller
      *           name="description",
      *           in="query",
      *           description="Description"
-     *       ),
-     *       @OA\Parameter(
-     *           name="price",
-     *           in="query",
-     *           description="Price"
-     *       ),
-     *       @OA\Parameter(
-     *           name="quantity",
-     *           in="query",
-     *           description="Quantity"
      *       ),
      *       @OA\Parameter(
      *           name="sort",
@@ -75,7 +55,7 @@ class InventoryController extends Controller
      *
      *       @OA\Response(
      *          response=200,
-     *          description="Get list inventories successfully",
+     *          description="Get list categories successfully",
      *
      *          @OA\JsonContent(
      *
@@ -86,26 +66,26 @@ class InventoryController extends Controller
      *
      *      @OA\Response(
      *          response=400,
-     *          description="Get list inventories failed",
+     *          description="Get list categories failed",
      *
      *          @OA\JsonContent(
      *
      *              @OA\Property(property="status", type="boolean", example=false),
-     *              @OA\Property(property="message", type="string", example="Get list inventories failed"),
+     *              @OA\Property(property="message", type="string", example="Get list categories failed"),
      *          )
      *      ),
      * )
      */
     public function index(Request $request)
     {
-        $data = InventoryService::list($request);
+        $data = CategoryService::list($request);
         if (isset($data['status']) && ! $data['status']) {
             return $this->responseJson('error', $data['message'], $data['data'], $data['statusCode']);
         }
 
         return $this->responseJson(
             'pagination',
-            __('Get list inventories successfully'),
+            __('Get list categories successfully'),
             $data,
             $data['statusCode'],
             [$request->sort_by, $request->sort]
@@ -114,41 +94,34 @@ class InventoryController extends Controller
 
     /**
      * @OA\Post(
-     *      path="/api/v1/inventories",
-     *      summary="Create a new inventory",
-     *      description="Create a new inventory",
-     *      tags={"Inventory"},
+     *      path="/api/v1/categories",
+     *      summary="Create a new category",
+     *      description="Create a new category",
+     *      tags={"Category"},
      *      security={
      *          {"token": {}}
      *      },
      *
      *      @OA\RequestBody(
+     *          required=true,
+     *          description="Data that needed to create a new category",
      *
-     *          @OA\MediaType(
-     *              mediaType="multipart/form-data",
+     *          @OA\JsonContent(
+     *              required={"name"},
      *
-     *              @OA\Schema(
-     *                  required={"category_id", "code", "name", "price", "quantity", "image"},
-     *
-     *                  @OA\Property(property="category_id", type="number", example=1),
-     *                  @OA\Property(property="code", type="string", example="INV1X"),
-     *                  @OA\Property(property="name", type="string", example="Choki-Choki"),
-     *                  @OA\Property(property="description", type="string", example="Chocolate wafer"),
-     *                  @OA\Property(property="price", type="number", example=10000),
-     *                  @OA\Property(property="quantity", type="number", example=15),
-     *                  @OA\Property(property="image", type="file"),
-     *              )
-     *          )
+     *              @OA\Property(property="name", type="string", example="Elektronik"),
+     *              @OA\Property(property="description", type="string", example="Elektronik"),
+     *          ),
      *      ),
      *
      *      @OA\Response(
      *          response=201,
-     *          description="Create a new inventory successfully",
+     *          description="Create a new category successfully",
      *
      *          @OA\JsonContent(
      *
      *              @OA\Property(property="status", type="boolean", example=true),
-     *              @OA\Property(property="message", type="string", example="Create a new inventory successfully"),
+     *              @OA\Property(property="message", type="string", example="Create a new category successfully"),
      *              @OA\Property(property="data", type="object", example={}),
      *          )
      *      ),
@@ -166,14 +139,14 @@ class InventoryController extends Controller
      *
      *      @OA\Response(
      *          response=500,
-     *          description="Create a new inventory failed",
+     *          description="Create a new category failed",
      *      ),
      * )
      */
     public function store(StoreRequest $request)
     {
         $data = $request->validated();
-        $data = InventoryService::store($data);
+        $data = CategoryService::store($data);
 
         return $this->responseJson(
             $data['status'] ? 'success' : 'error',
@@ -185,10 +158,10 @@ class InventoryController extends Controller
 
     /**
      * @OA\Get(
-     *       path="/api/v1/inventories/{id}",
-     *       summary="Get detail inventory",
-     *       description="Endpoint to get detail inventory",
-     *       tags={"Inventory"},
+     *       path="/api/v1/categories/{id}",
+     *       summary="Get detail category",
+     *       description="Endpoint to get detail category",
+     *       tags={"Category"},
      *       security={
      *           {"token": {}}
      *       },
@@ -202,31 +175,31 @@ class InventoryController extends Controller
      *
      *       @OA\Response(
      *          response=200,
-     *          description="Get inventory successfully",
+     *          description="Get category successfully",
      *
      *          @OA\JsonContent(
      *
      *              @OA\Property(property="status", type="boolean", example=true),
-     *              @OA\Property(property="message", type="string", example="Get inventory successfully"),
+     *              @OA\Property(property="message", type="string", example="Get category successfully"),
      *              @OA\Property(property="data", type="object", example={}),
      *          )
      *      ),
      *
      *      @OA\Response(
      *          response=404,
-     *          description="Inventory not found",
+     *          description="Category not found",
      *
      *          @OA\JsonContent(
      *
      *              @OA\Property(property="status", type="boolean", example=false),
-     *              @OA\Property(property="message", type="string", example="Inventory not found"),
+     *              @OA\Property(property="message", type="string", example="Category not found"),
      *          )
      *      ),
      * )
      */
     public function show($id)
     {
-        $data = InventoryService::getById($id);
+        $data = CategoryService::getById($id);
 
         return $this->responseJson(
             $data['status'] ? 'success' : 'error',
@@ -238,11 +211,11 @@ class InventoryController extends Controller
 
     // NOTE : only can POST method for form data
     /**
-     * @OA\Post(
-     *       path="/api/v1/inventories/{id}",
-     *       summary="Update inventory",
-     *       description="Endpoint to update inventory",
-     *       tags={"Inventory"},
+     * @OA\Put(
+     *       path="/api/v1/categories/{id}",
+     *       summary="Update category",
+     *       description="Endpoint to update category",
+     *       tags={"Category"},
      *       security={
      *           {"token": {}}
      *       },
@@ -254,45 +227,38 @@ class InventoryController extends Controller
      *           required=true,
      *       ),
      *
-     *       @OA\RequestBody(
+     *      @OA\RequestBody(
+     *          required=true,
+     *          description="Data that needed to update category",
      *
-     *           @OA\MediaType(
-     *               mediaType="multipart/form-data",
+     *          @OA\JsonContent(
+     *              required={"name"},
      *
-     *               @OA\Schema(
-     *                   required={"category_id", "code", "name", "price", "quantity"},
-     *
-     *                   @OA\Property(property="category_id", type="number", example=1),
-     *                   @OA\Property(property="code", type="string", example="INV1X"),
-     *                   @OA\Property(property="name", type="string", example="Choki-Choki"),
-     *                   @OA\Property(property="description", type="string", example="Chocolate wafer"),
-     *                   @OA\Property(property="price", type="number", example=10000),
-     *                   @OA\Property(property="quantity", type="number", example=15),
-     *                   @OA\Property(property="image", type="file"),
-     *               )
-     *           )
-     *       ),
+     *              @OA\Property(property="name", type="string", example="Elektronik"),
+     *              @OA\Property(property="description", type="string", example="Elektronik"),
+     *          ),
+     *      ),
      *
      *       @OA\Response(
      *          response=200,
-     *          description="Update inventory successfully",
+     *          description="Update category successfully",
      *
      *          @OA\JsonContent(
      *
      *              @OA\Property(property="status", type="boolean", example=true),
-     *              @OA\Property(property="message", type="string", example="Update inventory successfully"),
+     *              @OA\Property(property="message", type="string", example="Update category successfully"),
      *              @OA\Property(property="data", type="object", example={}),
      *          )
      *      ),
      *
      *      @OA\Response(
      *          response=400,
-     *          description="Update inventory failed",
+     *          description="Update category failed",
      *
      *          @OA\JsonContent(
      *
      *              @OA\Property(property="status", type="boolean", example=false),
-     *              @OA\Property(property="message", type="string", example="Update inventory failed"),
+     *              @OA\Property(property="message", type="string", example="Update category failed"),
      *          )
      *      ),
      * )
@@ -300,7 +266,7 @@ class InventoryController extends Controller
     public function update($id, UpdateRequest $request)
     {
         $data = $request->validated();
-        $data = InventoryService::update($id, $data);
+        $data = CategoryService::update($id, $data);
 
         return $this->responseJson(
             $data['status'] ? 'success' : 'error',
@@ -312,10 +278,10 @@ class InventoryController extends Controller
 
     /**
      * @OA\Delete(
-     *       path="/api/v1/inventories/{id}",
-     *       summary="Delete inventory",
-     *       description="Endpoint to delete inventory",
-     *       tags={"Inventory"},
+     *       path="/api/v1/categories/{id}",
+     *       summary="Delete category",
+     *       description="Endpoint to delete category",
+     *       tags={"Category"},
      *       security={
      *           {"token": {}}
      *       },
@@ -329,31 +295,31 @@ class InventoryController extends Controller
      *
      *       @OA\Response(
      *          response=200,
-     *          description="Delete inventory successfully",
+     *          description="Delete category successfully",
      *
      *          @OA\JsonContent(
      *
      *              @OA\Property(property="status", type="boolean", example=true),
-     *              @OA\Property(property="message", type="string", example="Delete inventory successfully"),
+     *              @OA\Property(property="message", type="string", example="Delete category successfully"),
      *              @OA\Property(property="data", type="object", example={}),
      *          )
      *      ),
      *
      *      @OA\Response(
      *          response=404,
-     *          description="Inventory not found",
+     *          description="Category not found",
      *
      *          @OA\JsonContent(
      *
      *              @OA\Property(property="status", type="boolean", example=false),
-     *              @OA\Property(property="message", type="string", example="Inventory not found"),
+     *              @OA\Property(property="message", type="string", example="Category not found"),
      *          )
      *      ),
      * )
      */
     public function destroy($id)
     {
-        $data = InventoryService::delete($id);
+        $data = CategoryService::delete($id);
 
         return $this->responseJson(
             $data['status'] ? 'success' : 'error',

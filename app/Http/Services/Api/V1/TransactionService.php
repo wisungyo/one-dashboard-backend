@@ -6,21 +6,26 @@ use App\Enums\ExpenseType;
 use App\Enums\IncomeType;
 use App\Enums\TransactionType;
 use App\Http\Filters\Api\V1\ByCode;
-use App\Http\Filters\Api\V1\ByInventoryId;
-use App\Http\Filters\Api\V1\ByPrice;
-use App\Http\Filters\Api\V1\ByQuantity;
-use App\Http\Filters\Api\V1\ByTotal;
+use App\Http\Filters\Api\V1\ByCustomerAddress;
+use App\Http\Filters\Api\V1\ByCustomerName;
+use App\Http\Filters\Api\V1\ByCustomerPhone;
+use App\Http\Filters\Api\V1\ByNote;
+use App\Http\Filters\Api\V1\ByTotalItem;
+use App\Http\Filters\Api\V1\ByTotalPrice;
+use App\Http\Filters\Api\V1\ByTotalQuantity;
 use App\Http\Filters\Api\V1\ByType;
+use App\Http\Filters\Api\V1\HasItemsInventoryCategoryId;
+use App\Http\Filters\Api\V1\HasItemsInventoryId;
 use App\Http\Filters\Api\V1\OrderBy;
 use App\Http\Resources\Api\V1\TransactionResource;
 use App\Models\Inventory;
 use App\Models\Transaction;
+use App\Models\TransactionItem;
 use Facades\App\Http\Services\Api\V1\ExpenseService;
 use Facades\App\Http\Services\Api\V1\IncomeService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Storage;
 
 class TransactionService extends BaseResponse
 {
@@ -29,12 +34,17 @@ class TransactionService extends BaseResponse
         try {
             $query = Transaction::query();
             $piplines = [
-                ByInventoryId::class,
+                HasItemsInventoryCategoryId::class,
+                HasItemsInventoryId::class,
                 ByCode::class,
                 ByType::class,
-                ByPrice::class,
-                ByQuantity::class,
-                ByTotal::class,
+                ByTotalItem::class,
+                ByTotalQuantity::class,
+                ByTotalPrice::class,
+                ByCustomerName::class,
+                ByCustomerPhone::class,
+                ByCustomerAddress::class,
+                ByNote::class,
                 OrderBy::class,
             ];
 
@@ -52,27 +62,55 @@ class TransactionService extends BaseResponse
     {
         DB::beginTransaction();
         try {
-            $inventory = Inventory::find($data['inventory_id']);
-            if (! $inventory) {
+            $items = $data['items'];
+            $inventoryIds = array_column($items, 'inventory_id');
+            $inventories = Inventory::whereIn('id', $inventoryIds)->get();
+            if ($inventories->count() != count($items)) {
                 return $this->responseError('Inventory not found.', 404);
             }
 
-            if ($inventory->quantity <= 0) {
-                return $this->responseError('Out of stock.', 400);
+            $totalItem = 0;
+            $totalQuantity = 0;
+            $totalPrice = 0;
+            $data['items'] = [];
+
+            foreach ($inventories as $inventory) {
+                $item = collect($items)->firstWhere('inventory_id', $inventory->id);
+                if ($inventory->quantity <= 0) {
+                    return $this->responseError("Out of stock for {$inventory->name}", 400);
+                }
+
+                if ($inventory->quantity < $item['quantity']) {
+                    return $this->responseError("Stock not enough for {$inventory->name}", 400);
+                }
+
+                $totalQuantity += $item['quantity'];
+                $totalItem++;
+                $totalPrice += $inventory->price * $item['quantity'];
+
+                array_push($data['items'], [
+                    'inventory_id' => $inventory->id,
+                    'price' => $inventory->price,
+                    'quantity' => $item['quantity'],
+                    'total' => $inventory->price * $item['quantity'],
+                    'note' => isset($item['note']) ? $item['note'] : null,
+                ]);
             }
 
-            if ($inventory->quantity < $data['quantity']) {
-                return $this->responseError('Stock not enough.', 400);
-            }
-
-            $data['price'] = $inventory->price;
-            $data['total'] = $data['price'] * $data['quantity'];
-            $data['code'] = 'TRX-'.$data['inventory_id'].'-'.$data['type']->value.'-'.date('YmdHis');
+            $data['total_item'] = $totalItem;
+            $data['total_quantity'] = $totalQuantity;
+            $data['total_price'] = $totalPrice;
+            $data['code'] = 'TRX-'.$data['type']->value.'-'.date('YmdHis');
             $data['created_by'] = auth()->id();
 
+            // Create transaction with the items
             $transaction = Transaction::create($data);
+            for ($i = 0; $i < count($data['items']); $i++) {
+                $data['items'][$i]['transaction_id'] = $transaction->id;
+            }
+            TransactionItem::insert($data['items']);
 
-            // Add image
+            // Add image for transaction
             if (isset($data['image'])) {
                 $transaction->images()->create([
                     'type' => 'transaction',
@@ -85,25 +123,47 @@ class TransactionService extends BaseResponse
                 ]);
             }
 
+            // Add image for transaction items
+            $trxItems = TransactionItem::where('transaction_id', $transaction->id)->get();
+            foreach ($trxItems as $trxItem) {
+                $item = collect($items)->firstWhere('inventory_id', $trxItem->inventory_id);
+                if (! isset($item['image'])) {
+                    continue;
+                }
+                $trxItem->images()->delete();
+                $trxItem->images()->create([
+                    'type' => 'transaction_item',
+                    'size' => $item['image']->getSize(),
+                    'mime_type' => $item['image']->getMimeType(),
+                    'file_name' => $item['image']->getClientOriginalName(),
+                    'path' => $item['image']->store('images/transaction_item'),
+                    'height' => 0,
+                    'width' => 0,
+                ]);
+            }
+
             if ($data['type'] == TransactionType::IN) {
                 // Add expense
                 $expense = ExpenseService::calculate($transaction, ExpenseType::ADD);
                 if (! $expense['status']) {
                     DB::rollBack();
-                    Log::error($expense['message'], $expense['data']['errors']);
+                    Log::error($expense['message']);
 
                     return $this->responseError($expense['message'], $expense['statusCode'], $expense['data']['errors']);
                 }
             } elseif ($data['type'] == TransactionType::OUT) {
-                // Deduct inventory quantity
-                $inventory->quantity -= $data['quantity'];
-                $inventory->save();
+                // Deduct inventories quantity
+                foreach ($inventories as $inventory) {
+                    $item = collect($items)->firstWhere('inventory_id', $inventory->id);
+                    $inventory->quantity -= $item['quantity'];
+                    $inventory->save();
+                }
 
                 // Add Income
                 $income = IncomeService::calculate($transaction, IncomeType::ADD);
                 if (! $income['status']) {
                     DB::rollBack();
-                    Log::error($income['message'], $income['data']['errors']);
+                    Log::error($income['message']);
 
                     return $this->responseError($income['message'], $income['statusCode'], $income['data']['errors']);
                 }
@@ -136,115 +196,5 @@ class TransactionService extends BaseResponse
         $resource = new TransactionResource($transaction);
 
         return $this->responseSuccess('Transaction found.', 200, $resource);
-    }
-
-    public function update($id, $data)
-    {
-        DB::beginTransaction();
-        try {
-            $transaction = Transaction::find($id);
-            if (! $transaction) {
-                return $this->responseError('Transaction not found.', 404);
-            }
-
-            if ($transaction->type != TransactionType::OUT) {
-                return $this->responseError('Transaction type not out.', 400);
-            }
-
-            $inventory = $transaction->inventory;
-            $diffQuantity = $data['quantity'] - $transaction->quantity;
-            if ($inventory->quantity < $diffQuantity) {
-                return $this->responseError('Stock not enough.', 400);
-            }
-
-            $prevTotalAmount = $transaction->total;
-            $transaction->update($data);
-            $diffTotalAmount = $transaction->total - $prevTotalAmount;
-
-            // Update image
-            if (isset($data['image'])) {
-                $transaction->images()->delete();
-                $transaction->images()->create([
-                    'type' => 'transaction',
-                    'size' => $data['image']->getSize(),
-                    'mime_type' => $data['image']->getMimeType(),
-                    'file_name' => $data['image']->getClientOriginalName(),
-                    'path' => Storage::putFile('images/transaction', $data['image']),
-                    'height' => 0,
-                    'width' => 0,
-                ]);
-            }
-
-            // Add out transaction to deduct the previous total amount
-            $trxData = [
-                'inventory_id' => $transaction->inventory_id,
-                'type' => TransactionType::OUT,
-                'price' => $diffTotalAmount,
-                'quantity' => $diffQuantity,
-                'note' => 'Update transaction',
-            ];
-            $trxResp = $this->store($trxData);
-            if (isset($trxResp['status']) && ! $trxResp['status']) {
-                DB::rollBack();
-                Log::error($trxResp['message']);
-
-                return $this->responseError($trxResp['message'], $trxResp['statusCode'], $trxResp['data']['errors']);
-            }
-
-            // // Recalculate income
-            // $income = IncomeService::calculate($transaction, IncomeType::UPDATE, $diffTotalAmount);
-            // if (! $income['status']) {
-            //     DB::rollBack();
-            //     Log::error($income['message'], $income['data']['errors']);
-
-            //     return $this->responseError($income['message'], $income['statusCode'], $income['data']['errors']);
-            // }
-
-            $resource = new TransactionResource($transaction);
-
-            DB::commit();
-        } catch (\Exception $th) {
-            DB::rollBack();
-            Log::error($th);
-
-            return $this->responseError('Failed to update transaction.', 500, $th->getMessage());
-        }
-
-        return $this->responseSuccess('Transaction has been updated successfully.', 200, $resource);
-    }
-
-    public function delete($id)
-    {
-        DB::beginTransaction();
-        try {
-            $transaction = Transaction::find($id);
-            if (! $transaction) {
-                return $this->responseError('Transaction not found.', 404);
-            }
-
-            if ($transaction->type != TransactionType::OUT) {
-                return $this->responseError('Transaction type not out.', 400);
-            }
-
-            // Recalculate income
-            $income = IncomeService::calculate(null, IncomeType::REMOVE, $transaction->total);
-            if (! $income['status']) {
-                DB::rollBack();
-                Log::error($income['message'], $income['data']['errors']);
-
-                return $this->responseError($income['message'], $income['statusCode'], $income['data']['errors']);
-            }
-
-            $transaction->delete();
-
-            DB::commit();
-        } catch (\Exception $th) {
-            DB::rollBack();
-            Log::error($th);
-
-            return $this->responseError('Failed to delete transaction.', 500, $th->getMessage());
-        }
-
-        return $this->responseSuccess('Transaction has been deleted successfully.', 200);
     }
 }

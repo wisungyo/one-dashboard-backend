@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\V1\AuthController;
+use App\Http\Controllers\Api\V1\CategoryController;
 use App\Http\Controllers\Api\V1\InventoryController;
 use App\Http\Controllers\Api\V1\PredictionController;
 use App\Http\Controllers\Api\V1\ProfileController;
@@ -24,13 +25,15 @@ Route::name('api.v1.')
         });
 
         Route::middleware('auth:sanctum')->group(function () {
+            // Category
+            Route::resource('categories', CategoryController::class);
+
             // Inventory
             Route::resource('inventories', InventoryController::class)->only(['index', 'store', 'show', 'destroy']);
             Route::post('/inventories/{id}', [InventoryController::class, 'update'])->name('inventories.update');
 
             // Transaction
-            Route::resource('transactions', TransactionController::class)->only(['index', 'store', 'show', 'destroy']);
-            Route::post('/transactions/{id}', [TransactionController::class, 'update'])->name('transactions.update');
+            Route::resource('transactions', TransactionController::class)->only(['index', 'store', 'show']);
 
             // Profile
             Route::controller(ProfileController::class)->prefix('profile')->name('profile.')->group(function () {

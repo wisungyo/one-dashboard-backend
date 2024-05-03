@@ -3,8 +3,6 @@
 namespace App\Http\Services\Api\V1;
 
 use App\Enums\TransactionType;
-use App\Http\Resources\Api\V1\IncomeResource;
-use App\Models\Income;
 use App\Models\Transaction;
 use Illuminate\Support\Facades\Log;
 
@@ -98,7 +96,7 @@ class PredictionService extends BaseResponse
             $firstTimestamp = strtotime('-'.self::MONTH_PERIODE - 1 .' month', $initTimestamp);
 
             // Sum transaction quantity per month
-            $transactions = Transaction::selectRaw('SUM(quantity) as '.(self::KEY_TOTAL).', SUM(total) as amount, YEAR(created_at) as year, MONTH(created_at) as month')
+            $transactions = Transaction::selectRaw('SUM(total_quantity) as '.(self::KEY_TOTAL).', SUM(total_price) as amount, YEAR(created_at) as year, MONTH(created_at) as month')
                 ->where('type', TransactionType::OUT)
                 ->where('created_at', '>=', date('Y-m-d', $firstTimestamp))
                 ->where('created_at', '<=', date('Y-m-t', $initTimestamp))
@@ -106,7 +104,7 @@ class PredictionService extends BaseResponse
                 ->orderBy('year', 'asc')
                 ->orderBy('month', 'asc')
                 ->get();
-            
+
             $actual = [];
             foreach ($transactions as $transaction) {
                 $actual[] = [
@@ -136,12 +134,12 @@ class PredictionService extends BaseResponse
                 'init_timestamp' => date('Y-m-d', $initTimestamp),
                 'first_timestamp' => date('Y-m-d', $firstTimestamp),
                 'prediction_value' => $predictionValue,
+                'mape_value' => $this->mape($actual, $predictions),
+                'mse_value' => $this->mse($actual, $predictions),
+                'mad_value' => $this->mad($actual, $predictions),
                 'transactions' => $transactions,
                 'actual' => $actual,
                 'predictions' => $predictions,
-                'mape' => $this->mape($actual, $predictions),
-                'mse' => $this->mse($actual, $predictions),
-                'mad' => $this->mad($actual, $predictions),
             ];
 
             return $this->responseSuccess(__('Get prediction value successfully'), 200, $data);

@@ -12,8 +12,7 @@ class Income extends Model
     use SoftDeletes;
 
     protected $fillable = [
-        'year',
-        'month',
+        'date',
         'amount',
         'created_by',
     ];

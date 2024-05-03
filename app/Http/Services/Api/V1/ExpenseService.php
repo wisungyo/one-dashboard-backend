@@ -22,19 +22,16 @@ class ExpenseService extends BaseResponse
             }
 
             $data = [
-                'year' => date('Y'),
-                'month' => date('m'),
+                'date' => date('Y-m-d'),
                 'created_by' => auth()->id(),
             ];
             if ($type == ExpenseType::ADD) {
-                $data['amount'] = $transaction->total;
+                $data['amount'] = $transaction->total_price;
             } else {
                 $data['amount'] = $amount;
             }
 
-            $expense = Expense::where('year', $data['year'])
-                ->where('month', $data['month'])
-                ->first();
+            $expense = Expense::where('date', $data['date'])->first();
 
             if ($expense) {
                 if (in_array($type, [ExpenseType::ADD, ExpenseType::UPDATE])) {

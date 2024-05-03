@@ -29,19 +29,16 @@ class IncomeService extends BaseResponse
             }
 
             $data = [
-                'year' => date('Y'),
-                'month' => date('m'),
+                'date' => date('Y-m-d'),
                 'created_by' => auth()->id(),
             ];
             if ($type == IncomeType::ADD) {
-                $data['amount'] = $transaction->total;
+                $data['amount'] = $transaction->total_price;
             } else {
                 $data['amount'] = $amount;
             }
 
-            $income = Income::where('year', $data['year'])
-                ->where('month', $data['month'])
-                ->first();
+            $income = Income::where('date', $data['date'])->first();
 
             if ($income) {
                 if (in_array($type, [IncomeType::ADD, IncomeType::UPDATE])) {

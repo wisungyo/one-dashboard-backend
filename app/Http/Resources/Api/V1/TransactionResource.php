@@ -16,13 +16,15 @@ class TransactionResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'inventory_id' => $this->inventory_id,
             'code' => $this->code,
             'type' => $this->type,
-            'price' => $this->price,
-            'quantity' => $this->quantity,
-            'total' => $this->price * $this->quantity,
-            'image' => new ImageResource($this->image),
+            'total_price' => $this->total_price,
+            'total_quantity' => $this->total_quantity,
+            'customer_name' => $this->customer_name,
+            'customer_phone' => $this->customer_phone,
+            'customer_address' => $this->customer_address,
+            'note' => $this->note,
+            'items' => TransactionItemResource::collection($this->items),
         ];
     }
 }

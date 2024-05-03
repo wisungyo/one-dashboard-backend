@@ -1,7 +1,6 @@
 <?php
 
 use App\Enums\TransactionType;
-use App\Models\Inventory;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -15,12 +14,14 @@ return new class extends Migration
     {
         Schema::create('transactions', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(Inventory::class);
             $table->string('code')->unique();
-            $table->enum('type', TransactionType::toArray())->default(TransactionType::IN);
-            $table->float('price', 10, 2);
-            $table->tinyInteger('quantity');
-            $table->float('total', 10, 2);
+            $table->enum('type', TransactionType::toArray())->default(TransactionType::OUT);
+            $table->tinyInteger('total_item');
+            $table->tinyInteger('total_quantity');
+            $table->float('total_price', 10, 2);
+            $table->string('customer_name')->nullable();
+            $table->string('customer_phone')->nullable();
+            $table->string('customer_address')->nullable();
             $table->text('note')->nullable();
             $table->foreignId('created_by')->constrained('users');
             $table->timestamps();

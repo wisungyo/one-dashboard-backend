@@ -5,47 +5,32 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Inventory extends Model
+class TransactionItem extends Model
 {
     use HasFactory;
     use SoftDeletes;
 
     protected $fillable = [
-        'category_id',
-        'code',
-        'name',
-        'description',
+        'transaction_id',
+        'inventory_id',
         'price',
         'quantity',
-        'created_by',
+        'total',
+        'note',
     ];
 
-    protected function casts(): array
+    public function transaction(): BelongsTo
     {
-        return [
-            'price' => 'float',
-            'quantity' => 'integer',
-        ];
+        return $this->belongsTo(Transaction::class);
     }
 
-    public function category(): BelongsTo
+    public function inventory(): BelongsTo
     {
-        return $this->belongsTo(Category::class);
-    }
-
-    public function author(): BelongsTo
-    {
-        return $this->belongsTo(User::class, 'created_by');
-    }
-
-    public function transactions(): HasMany
-    {
-        return $this->hasMany(Transaction::class);
+        return $this->belongsTo(Inventory::class);
     }
 
     public function images(): MorphMany

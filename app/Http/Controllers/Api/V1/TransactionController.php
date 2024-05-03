@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Api\V1;
 use App\Cores\ApiResponse;
 use App\Enums\TransactionType;
 use App\Http\Requests\Api\V1\Transaction\StoreRequest;
-use App\Http\Requests\Api\V1\Transaction\UpdateRequest;
 use Facades\App\Http\Services\Api\V1\TransactionService;
 use Illuminate\Http\Request;
 
@@ -24,6 +23,11 @@ class TransactionController extends Controller
      *       },
      *
      *       @OA\Parameter(
+     *           name="category_id",
+     *           in="query",
+     *           description="Category ID"
+     *       ),
+     *       @OA\Parameter(
      *           name="inventory_id",
      *           in="query",
      *           description="Inventory ID"
@@ -36,22 +40,42 @@ class TransactionController extends Controller
      *       @OA\Parameter(
      *           name="type",
      *           in="query",
-     *           description="Type ('in' or 'out')"
+     *           description="Type ('IN' or 'OUT')"
      *       ),
      *       @OA\Parameter(
-     *           name="price",
+     *           name="total_item",
      *           in="query",
-     *           description="Price"
+     *           description="Total Item"
      *       ),
      *       @OA\Parameter(
-     *           name="quantity",
+     *           name="total_quantity",
      *           in="query",
-     *           description="Quantity"
+     *           description="Total Quantity"
      *       ),
      *       @OA\Parameter(
-     *           name="total",
+     *           name="total_price",
      *           in="query",
-     *           description="Total"
+     *           description="Total Price"
+     *       ),
+     *       @OA\Parameter(
+     *           name="customer_name",
+     *           in="query",
+     *           description="Customer Name"
+     *       ),
+     *       @OA\Parameter(
+     *           name="customer_phone",
+     *           in="query",
+     *           description="Customer Phone"
+     *       ),
+     *       @OA\Parameter(
+     *           name="customer_address",
+     *           in="query",
+     *           description="Customer Address"
+     *       ),
+     *       @OA\Parameter(
+     *           name="note",
+     *           in="query",
+     *           description="Note"
      *       ),
      *       @OA\Parameter(
      *           name="sort",
@@ -125,17 +149,31 @@ class TransactionController extends Controller
      *
      *      @OA\RequestBody(
      *
-     *          @OA\MediaType(
-     *              mediaType="multipart/form-data",
+     *          required=true,
+     *          description="Data that needed to create a new transaction",
      *
-     *              @OA\Schema(
-     *                  required={"inventory_id", "quantity"},
+     *          @OA\JsonContent(
+     *              required={"note", "items"},
      *
-     *                  @OA\Property(property="inventory_id", type="number", example=1),
-     *                  @OA\Property(property="quantity", type="number", example=2),
-     *                  @OA\Property(property="image", type="file"),
-     *              )
-     *          )
+     *              @OA\Property(property="customer_name", type="string", example="John Doe"),
+     *              @OA\Property(property="customer_phone", type="string", example="08123456789"),
+     *              @OA\Property(property="customer_address", type="string", example="Jl. Raya No. 1"),
+     *              @OA\Property(property="note", type="string", example="Buy some items"),
+     *              @OA\Property(
+     *                  property="items",
+     *                  type="array",
+     *                  description="Array of transaction items",
+     *
+     *                   @OA\Items(
+     *                      type="object",
+     *                      required={"inventory_id", "quantity"},
+     *
+     *                      @OA\Property(property="inventory_id", type="integer", description="Inventory ID", example=1),
+     *                      @OA\Property(property="quantity", type="integer", description="Quantity of the item", example=1),
+     *                      @OA\Property(property="note", type="string", description="Note of the item", example="Buy some items"),
+     *                  ),
+     *              ),
+     *          ),
      *      ),
      *
      *      @OA\Response(
@@ -145,7 +183,7 @@ class TransactionController extends Controller
      *          @OA\JsonContent(
      *
      *              @OA\Property(property="status", type="boolean", example=true),
-     *              @OA\Property(property="message", type="string", example="Register customer successfully"),
+     *              @OA\Property(property="message", type="string", example="Register a new transaction successfully"),
      *              @OA\Property(property="data", type="object", example={}),
      *          )
      *      ),
@@ -231,128 +269,6 @@ class TransactionController extends Controller
             $data['message'],
             $data['data'],
             $data['statusCode'],
-        );
-    }
-
-    // NOTE : only can POST method for form data
-    /**
-     * @OA\Post(
-     *       path="/api/v1/transactions/{id}",
-     *       summary="Update transaction",
-     *       description="Endpoint to update transaction",
-     *       tags={"Transaction"},
-     *       security={
-     *           {"token": {}}
-     *       },
-     *
-     *       @OA\Parameter(
-     *           name="id",
-     *           in="path",
-     *           description="ID",
-     *           required=true,
-     *       ),
-     *
-     *       @OA\RequestBody(
-     *
-     *           @OA\MediaType(
-     *               mediaType="multipart/form-data",
-     *
-     *               @OA\Schema(
-     *                   required={"quantity"},
-     *
-     *                   @OA\Property(property="quantity", type="number", example=15),
-     *                   @OA\Property(property="image", type="file"),
-     *               )
-     *           )
-     *       ),
-     *
-     *       @OA\Response(
-     *          response=200,
-     *          description="Update transaction successfully",
-     *
-     *          @OA\JsonContent(
-     *
-     *              @OA\Property(property="status", type="boolean", example=true),
-     *              @OA\Property(property="message", type="string", example="Update transaction successfully"),
-     *              @OA\Property(property="data", type="object", example={}),
-     *          )
-     *      ),
-     *
-     *      @OA\Response(
-     *          response=400,
-     *          description="Update transaction failed",
-     *
-     *          @OA\JsonContent(
-     *
-     *              @OA\Property(property="status", type="boolean", example=false),
-     *              @OA\Property(property="message", type="string", example="Update transaction failed"),
-     *          )
-     *      ),
-     * )
-     */
-    public function update($id, UpdateRequest $request)
-    {
-        $data = $request->validated();
-        $data = TransactionService::update($id, $data);
-
-        return $this->responseJson(
-            $data['status'] ? 'success' : 'error',
-            $data['message'],
-            $data['data'],
-            $data['statusCode']
-        );
-    }
-
-    /**
-     * @OA\Delete(
-     *       path="/api/v1/transactions/{id}",
-     *       summary="Delete transaction",
-     *       description="Endpoint to delete transaction",
-     *       tags={"Transaction"},
-     *       security={
-     *           {"token": {}}
-     *       },
-     *
-     *       @OA\Parameter(
-     *           name="id",
-     *           in="path",
-     *           description="ID",
-     *           required=true,
-     *       ),
-     *
-     *       @OA\Response(
-     *          response=200,
-     *          description="Delete transaction successfully",
-     *
-     *          @OA\JsonContent(
-     *
-     *              @OA\Property(property="status", type="boolean", example=true),
-     *              @OA\Property(property="message", type="string", example="Delete transaction successfully"),
-     *              @OA\Property(property="data", type="object", example={}),
-     *          )
-     *      ),
-     *
-     *      @OA\Response(
-     *          response=404,
-     *          description="Transaction not found",
-     *
-     *          @OA\JsonContent(
-     *
-     *              @OA\Property(property="status", type="boolean", example=false),
-     *              @OA\Property(property="message", type="string", example="Transaction not found"),
-     *          )
-     *      ),
-     * )
-     */
-    public function destroy($id)
-    {
-        $data = TransactionService::delete($id);
-
-        return $this->responseJson(
-            $data['status'] ? 'success' : 'error',
-            $data['message'],
-            $data['data'],
-            $data['statusCode']
         );
     }
 }

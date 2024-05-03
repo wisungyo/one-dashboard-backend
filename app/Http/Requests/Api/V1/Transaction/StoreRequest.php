@@ -22,9 +22,14 @@ class StoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'inventory_id' => ['required', 'integer', 'exists:inventories,id'],
-            'quantity' => ['required', 'integer'],
-            'image' => ['nullable', 'image', 'mimes:'.getImageTypesValidation(), 'max:'.getMaxImageSize()],
+            'customer_name' => ['nullable', 'string'],
+            'customer_phone' => ['nullable', 'string'],
+            'customer_address' => ['nullable', 'string'],
+            'note' => ['required', 'string'],
+
+            'items' => ['required', 'array'],
+            'items.*.inventory_id' => ['required', 'integer', 'exists:inventories,id'],
+            'items.*.quantity' => ['required', 'integer', 'min:1'],
         ];
     }
 }
