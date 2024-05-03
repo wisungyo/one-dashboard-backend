@@ -3,13 +3,12 @@
 namespace Database\Factories;
 
 use App\Models\Category;
-use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Inventory>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Product>
  */
-class InventoryFactory extends Factory
+class ProductFactory extends Factory
 {
     /**
      * Define the model's default state.
@@ -19,13 +18,13 @@ class InventoryFactory extends Factory
     public function definition(): array
     {
         return [
-            'category_id' => Category::factory(),
+            'category_id' => $this->faker->numberBetween(1, Category::count()),
             'code' => $this->faker->unique()->word(),
             'name' => $this->faker->name,
             'description' => $this->faker->sentence,
-            'price' => $this->faker->randomFloat(2, 0, 1000),
-            'quantity' => $this->faker->randomNumber(),
-            'created_by' => User::factory(),
+            'price' => $this->faker->randomFloat(2, 1000, 100000),
+            'quantity' => $this->faker->randomDigitNotNull(),
+            'created_by' => 1,
         ];
     }
 }

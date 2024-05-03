@@ -14,11 +14,11 @@ use App\Http\Filters\Api\V1\ByTotalItem;
 use App\Http\Filters\Api\V1\ByTotalPrice;
 use App\Http\Filters\Api\V1\ByTotalQuantity;
 use App\Http\Filters\Api\V1\ByType;
-use App\Http\Filters\Api\V1\HasItemsInventoryCategoryId;
-use App\Http\Filters\Api\V1\HasItemsInventoryId;
+use App\Http\Filters\Api\V1\HasItemsProductCategoryId;
+use App\Http\Filters\Api\V1\HasItemsProductId;
 use App\Http\Filters\Api\V1\OrderBy;
 use App\Http\Resources\Api\V1\TransactionResource;
-use App\Models\Inventory;
+use App\Models\Product;
 use App\Models\Transaction;
 use App\Models\TransactionItem;
 use Facades\App\Http\Services\Api\V1\ExpenseService;
@@ -34,8 +34,8 @@ class TransactionService extends BaseResponse
         try {
             $query = Transaction::query();
             $piplines = [
-                HasItemsInventoryCategoryId::class,
-                HasItemsInventoryId::class,
+                HasItemsProductCategoryId::class,
+                HasItemsProductId::class,
                 ByCode::class,
                 ByType::class,
                 ByTotalItem::class,
@@ -63,10 +63,10 @@ class TransactionService extends BaseResponse
         DB::beginTransaction();
         try {
             $items = $data['items'];
-            $inventoryIds = array_column($items, 'inventory_id');
-            $inventories = Inventory::whereIn('id', $inventoryIds)->get();
-            if ($inventories->count() != count($items)) {
-                return $this->responseError('Inventory not found.', 404);
+            $productIds = array_column($items, 'product_id');
+            $products = Product::whereIn('id', $productIds)->get();
+            if ($products->count() != count($items)) {
+                return $this->responseError('Product not found.', 404);
             }
 
             $totalItem = 0;
@@ -74,25 +74,25 @@ class TransactionService extends BaseResponse
             $totalPrice = 0;
             $data['items'] = [];
 
-            foreach ($inventories as $inventory) {
-                $item = collect($items)->firstWhere('inventory_id', $inventory->id);
-                if ($inventory->quantity <= 0) {
-                    return $this->responseError("Out of stock for {$inventory->name}", 400);
+            foreach ($products as $product) {
+                $item = collect($items)->firstWhere('product_id', $product->id);
+                if ($product->quantity <= 0) {
+                    return $this->responseError("Out of stock for {$product->name}", 400);
                 }
 
-                if ($inventory->quantity < $item['quantity']) {
-                    return $this->responseError("Stock not enough for {$inventory->name}", 400);
+                if ($product->quantity < $item['quantity']) {
+                    return $this->responseError("Stock not enough for {$product->name}", 400);
                 }
 
                 $totalQuantity += $item['quantity'];
                 $totalItem++;
-                $totalPrice += $inventory->price * $item['quantity'];
+                $totalPrice += $product->price * $item['quantity'];
 
                 array_push($data['items'], [
-                    'inventory_id' => $inventory->id,
-                    'price' => $inventory->price,
+                    'product_id' => $product->id,
+                    'price' => $product->price,
                     'quantity' => $item['quantity'],
-                    'total' => $inventory->price * $item['quantity'],
+                    'total' => $product->price * $item['quantity'],
                     'note' => isset($item['note']) ? $item['note'] : null,
                 ]);
             }
@@ -126,7 +126,7 @@ class TransactionService extends BaseResponse
             // Add image for transaction items
             $trxItems = TransactionItem::where('transaction_id', $transaction->id)->get();
             foreach ($trxItems as $trxItem) {
-                $item = collect($items)->firstWhere('inventory_id', $trxItem->inventory_id);
+                $item = collect($items)->firstWhere('product_id', $trxItem->product_id);
                 if (! isset($item['image'])) {
                     continue;
                 }
@@ -152,11 +152,11 @@ class TransactionService extends BaseResponse
                     return $this->responseError($expense['message'], $expense['statusCode'], $expense['data']['errors']);
                 }
             } elseif ($data['type'] == TransactionType::OUT) {
-                // Deduct inventories quantity
-                foreach ($inventories as $inventory) {
-                    $item = collect($items)->firstWhere('inventory_id', $inventory->id);
-                    $inventory->quantity -= $item['quantity'];
-                    $inventory->save();
+                // Deduct products quantity
+                foreach ($products as $product) {
+                    $item = collect($items)->firstWhere('product_id', $product->id);
+                    $product->quantity -= $item['quantity'];
+                    $product->save();
                 }
 
                 // Add Income

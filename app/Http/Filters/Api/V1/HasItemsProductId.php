@@ -5,7 +5,7 @@ namespace App\Http\Filters\Api\V1;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 
-class HasItemsInventoryId
+class HasItemsProductId
 {
     public function __construct(protected Request $request)
     {
@@ -17,9 +17,9 @@ class HasItemsInventoryId
         $request = $this->request;
 
         return $next($builder)
-            ->when($request->has('inventory_id'), function ($query) use ($request) {
+            ->when($request->has('product_id'), function ($query) use ($request) {
                 $query->whereHas('items', function ($query) use ($request) {
-                    $query->where('inventory_id', $request->inventory_id);
+                    $query->where('product_id', $request->product_id);
                 });
             });
     }

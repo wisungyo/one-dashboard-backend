@@ -19,9 +19,9 @@ class Category extends Model
         'created_by',
     ];
 
-    public function inventories(): HasMany
+    public function products(): HasMany
     {
-        return $this->hasMany(Inventory::class);
+        return $this->hasMany(Product::class);
     }
 
     public function author(): BelongsTo

@@ -16,7 +16,7 @@ class TransactionItem extends Model
 
     protected $fillable = [
         'transaction_id',
-        'inventory_id',
+        'product_id',
         'price',
         'quantity',
         'total',
@@ -28,9 +28,9 @@ class TransactionItem extends Model
         return $this->belongsTo(Transaction::class);
     }
 
-    public function inventory(): BelongsTo
+    public function product(): BelongsTo
     {
-        return $this->belongsTo(Inventory::class);
+        return $this->belongsTo(Product::class);
     }
 
     public function images(): MorphMany

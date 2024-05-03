@@ -28,7 +28,7 @@ class StoreRequest extends FormRequest
             'note' => ['required', 'string'],
 
             'items' => ['required', 'array'],
-            'items.*.inventory_id' => ['required', 'integer', 'exists:inventories,id'],
+            'items.*.product_id' => ['required', 'integer', 'exists:products,id'],
             'items.*.quantity' => ['required', 'integer', 'min:1'],
         ];
     }

@@ -3,21 +3,21 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Cores\ApiResponse;
-use App\Http\Requests\Api\V1\Inventory\StoreRequest;
-use App\Http\Requests\Api\V1\Inventory\UpdateRequest;
-use Facades\App\Http\Services\Api\V1\InventoryService;
+use App\Http\Requests\Api\V1\Product\StoreRequest;
+use App\Http\Requests\Api\V1\Product\UpdateRequest;
+use Facades\App\Http\Services\Api\V1\ProductService;
 use Illuminate\Http\Request;
 
-class InventoryController extends Controller
+class ProductController extends Controller
 {
     use ApiResponse;
 
     /**
      * @OA\Get(
-     *       path="/api/v1/inventories",
-     *       summary="Get list inventories ",
-     *       description="Endpoint to get list inventories ",
-     *       tags={"Inventory"},
+     *       path="/api/v1/products",
+     *       summary="Get list products ",
+     *       description="Endpoint to get list products ",
+     *       tags={"Product"},
      *       security={
      *           {"token": {}}
      *       },
@@ -75,7 +75,7 @@ class InventoryController extends Controller
      *
      *       @OA\Response(
      *          response=200,
-     *          description="Get list inventories successfully",
+     *          description="Get list products successfully",
      *
      *          @OA\JsonContent(
      *
@@ -86,26 +86,26 @@ class InventoryController extends Controller
      *
      *      @OA\Response(
      *          response=400,
-     *          description="Get list inventories failed",
+     *          description="Get list products failed",
      *
      *          @OA\JsonContent(
      *
      *              @OA\Property(property="status", type="boolean", example=false),
-     *              @OA\Property(property="message", type="string", example="Get list inventories failed"),
+     *              @OA\Property(property="message", type="string", example="Get list products failed"),
      *          )
      *      ),
      * )
      */
     public function index(Request $request)
     {
-        $data = InventoryService::list($request);
+        $data = ProductService::list($request);
         if (isset($data['status']) && ! $data['status']) {
             return $this->responseJson('error', $data['message'], $data['data'], $data['statusCode']);
         }
 
         return $this->responseJson(
             'pagination',
-            __('Get list inventories successfully'),
+            __('Get list products successfully'),
             $data,
             $data['statusCode'],
             [$request->sort_by, $request->sort]
@@ -114,10 +114,10 @@ class InventoryController extends Controller
 
     /**
      * @OA\Post(
-     *      path="/api/v1/inventories",
-     *      summary="Create a new inventory",
-     *      description="Create a new inventory",
-     *      tags={"Inventory"},
+     *      path="/api/v1/products",
+     *      summary="Create a new product",
+     *      description="Create a new product",
+     *      tags={"Product"},
      *      security={
      *          {"token": {}}
      *      },
@@ -143,12 +143,12 @@ class InventoryController extends Controller
      *
      *      @OA\Response(
      *          response=201,
-     *          description="Create a new inventory successfully",
+     *          description="Create a new product successfully",
      *
      *          @OA\JsonContent(
      *
      *              @OA\Property(property="status", type="boolean", example=true),
-     *              @OA\Property(property="message", type="string", example="Create a new inventory successfully"),
+     *              @OA\Property(property="message", type="string", example="Create a new product successfully"),
      *              @OA\Property(property="data", type="object", example={}),
      *          )
      *      ),
@@ -166,14 +166,14 @@ class InventoryController extends Controller
      *
      *      @OA\Response(
      *          response=500,
-     *          description="Create a new inventory failed",
+     *          description="Create a new product failed",
      *      ),
      * )
      */
     public function store(StoreRequest $request)
     {
         $data = $request->validated();
-        $data = InventoryService::store($data);
+        $data = ProductService::store($data);
 
         return $this->responseJson(
             $data['status'] ? 'success' : 'error',
@@ -185,10 +185,10 @@ class InventoryController extends Controller
 
     /**
      * @OA\Get(
-     *       path="/api/v1/inventories/{id}",
-     *       summary="Get detail inventory",
-     *       description="Endpoint to get detail inventory",
-     *       tags={"Inventory"},
+     *       path="/api/v1/products/{id}",
+     *       summary="Get detail product",
+     *       description="Endpoint to get detail product",
+     *       tags={"Product"},
      *       security={
      *           {"token": {}}
      *       },
@@ -202,31 +202,31 @@ class InventoryController extends Controller
      *
      *       @OA\Response(
      *          response=200,
-     *          description="Get inventory successfully",
+     *          description="Get product successfully",
      *
      *          @OA\JsonContent(
      *
      *              @OA\Property(property="status", type="boolean", example=true),
-     *              @OA\Property(property="message", type="string", example="Get inventory successfully"),
+     *              @OA\Property(property="message", type="string", example="Get product successfully"),
      *              @OA\Property(property="data", type="object", example={}),
      *          )
      *      ),
      *
      *      @OA\Response(
      *          response=404,
-     *          description="Inventory not found",
+     *          description="Product not found",
      *
      *          @OA\JsonContent(
      *
      *              @OA\Property(property="status", type="boolean", example=false),
-     *              @OA\Property(property="message", type="string", example="Inventory not found"),
+     *              @OA\Property(property="message", type="string", example="Product not found"),
      *          )
      *      ),
      * )
      */
     public function show($id)
     {
-        $data = InventoryService::getById($id);
+        $data = ProductService::getById($id);
 
         return $this->responseJson(
             $data['status'] ? 'success' : 'error',
@@ -239,10 +239,10 @@ class InventoryController extends Controller
     // NOTE : only can POST method for form data
     /**
      * @OA\Post(
-     *       path="/api/v1/inventories/{id}",
-     *       summary="Update inventory",
-     *       description="Endpoint to update inventory",
-     *       tags={"Inventory"},
+     *       path="/api/v1/products/{id}",
+     *       summary="Update product",
+     *       description="Endpoint to update product",
+     *       tags={"Product"},
      *       security={
      *           {"token": {}}
      *       },
@@ -275,24 +275,24 @@ class InventoryController extends Controller
      *
      *       @OA\Response(
      *          response=200,
-     *          description="Update inventory successfully",
+     *          description="Update product successfully",
      *
      *          @OA\JsonContent(
      *
      *              @OA\Property(property="status", type="boolean", example=true),
-     *              @OA\Property(property="message", type="string", example="Update inventory successfully"),
+     *              @OA\Property(property="message", type="string", example="Update product successfully"),
      *              @OA\Property(property="data", type="object", example={}),
      *          )
      *      ),
      *
      *      @OA\Response(
      *          response=400,
-     *          description="Update inventory failed",
+     *          description="Update product failed",
      *
      *          @OA\JsonContent(
      *
      *              @OA\Property(property="status", type="boolean", example=false),
-     *              @OA\Property(property="message", type="string", example="Update inventory failed"),
+     *              @OA\Property(property="message", type="string", example="Update product failed"),
      *          )
      *      ),
      * )
@@ -300,7 +300,7 @@ class InventoryController extends Controller
     public function update($id, UpdateRequest $request)
     {
         $data = $request->validated();
-        $data = InventoryService::update($id, $data);
+        $data = ProductService::update($id, $data);
 
         return $this->responseJson(
             $data['status'] ? 'success' : 'error',
@@ -312,10 +312,10 @@ class InventoryController extends Controller
 
     /**
      * @OA\Delete(
-     *       path="/api/v1/inventories/{id}",
-     *       summary="Delete inventory",
-     *       description="Endpoint to delete inventory",
-     *       tags={"Inventory"},
+     *       path="/api/v1/products/{id}",
+     *       summary="Delete product",
+     *       description="Endpoint to delete product",
+     *       tags={"Product"},
      *       security={
      *           {"token": {}}
      *       },
@@ -329,31 +329,31 @@ class InventoryController extends Controller
      *
      *       @OA\Response(
      *          response=200,
-     *          description="Delete inventory successfully",
+     *          description="Delete product successfully",
      *
      *          @OA\JsonContent(
      *
      *              @OA\Property(property="status", type="boolean", example=true),
-     *              @OA\Property(property="message", type="string", example="Delete inventory successfully"),
+     *              @OA\Property(property="message", type="string", example="Delete product successfully"),
      *              @OA\Property(property="data", type="object", example={}),
      *          )
      *      ),
      *
      *      @OA\Response(
      *          response=404,
-     *          description="Inventory not found",
+     *          description="Product not found",
      *
      *          @OA\JsonContent(
      *
      *              @OA\Property(property="status", type="boolean", example=false),
-     *              @OA\Property(property="message", type="string", example="Inventory not found"),
+     *              @OA\Property(property="message", type="string", example="Product not found"),
      *          )
      *      ),
      * )
      */
     public function destroy($id)
     {
-        $data = InventoryService::delete($id);
+        $data = ProductService::delete($id);
 
         return $this->responseJson(
             $data['status'] ? 'success' : 'error',

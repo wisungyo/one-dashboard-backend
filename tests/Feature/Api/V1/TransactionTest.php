@@ -18,7 +18,7 @@ class TransactionTest extends TestCase
         $this->refreshDatabase();
         $this->seed();
 
-        // Create inventory
+        // Create product
         $invData = [
             'code' => $this->faker->unique()->word,
             'name' => $this->faker->name,
@@ -27,7 +27,7 @@ class TransactionTest extends TestCase
             'quantity' => $this->faker->randomNumber(2),
             'image' => UploadedFile::fake()->image('image.jpg'),
         ];
-        $response = $this->post('/api/v1/inventories', $invData, $this->getFormAuthorizationHeader());
+        $response = $this->post('/api/v1/products', $invData, $this->getFormAuthorizationHeader());
 
         $response->assertStatus(201)
             ->assertJsonStructure([
@@ -43,11 +43,11 @@ class TransactionTest extends TestCase
                 ],
             ]);
 
-        $this->assertDatabaseHas('inventories', ['code' => $response['data']['code']]);
+        $this->assertDatabaseHas('products', ['code' => $response['data']['code']]);
 
         // Create transaction
         $transData = [
-            'inventory_id' => $response['data']['id'],
+            'product_id' => $response['data']['id'],
             'quantity' => 1,
             'image' => UploadedFile::fake()->image('image.jpg'),
         ];
@@ -58,7 +58,7 @@ class TransactionTest extends TestCase
                 'status',
                 'data' => [
                     'id',
-                    'inventory_id',
+                    'product_id',
                     'code',
                     'type',
                     'price',
@@ -74,7 +74,7 @@ class TransactionTest extends TestCase
         $this->refreshDatabase();
         $this->seed();
 
-        // Create inventory
+        // Create product
         $invData = [
             'code' => $this->faker->unique()->word,
             'name' => $this->faker->name,
@@ -83,7 +83,7 @@ class TransactionTest extends TestCase
             'quantity' => $this->faker->randomNumber(2),
             'image' => UploadedFile::fake()->image('image.jpg'),
         ];
-        $response = $this->post('/api/v1/inventories', $invData, $this->getFormAuthorizationHeader());
+        $response = $this->post('/api/v1/products', $invData, $this->getFormAuthorizationHeader());
 
         $response->assertStatus(201)
             ->assertJsonStructure([
@@ -99,11 +99,11 @@ class TransactionTest extends TestCase
                 ],
             ]);
 
-        $this->assertDatabaseHas('inventories', ['code' => $response['data']['code']]);
+        $this->assertDatabaseHas('products', ['code' => $response['data']['code']]);
 
         // Create transaction
         $transData = [
-            'inventory_id' => $response['data']['id'],
+            'product_id' => $response['data']['id'],
             'quantity' => 1,
             'image' => UploadedFile::fake()->image('image.jpg'),
         ];
@@ -114,7 +114,7 @@ class TransactionTest extends TestCase
                 'status',
                 'data' => [
                     'id',
-                    'inventory_id',
+                    'product_id',
                     'code',
                     'type',
                     'price',
@@ -132,7 +132,7 @@ class TransactionTest extends TestCase
                 'data' => [
                     '*' => [
                         'id',
-                        'inventory_id',
+                        'product_id',
                         'code',
                         'type',
                         'price',
@@ -151,7 +151,7 @@ class TransactionTest extends TestCase
         $this->refreshDatabase();
         $this->seed();
 
-        // Create inventory
+        // Create product
         $invData = [
             'code' => $this->faker->unique()->word,
             'name' => $this->faker->name,
@@ -160,7 +160,7 @@ class TransactionTest extends TestCase
             'quantity' => $this->faker->randomNumber(2),
             'image' => UploadedFile::fake()->image('image.jpg'),
         ];
-        $response = $this->post('/api/v1/inventories', $invData, $this->getFormAuthorizationHeader());
+        $response = $this->post('/api/v1/products', $invData, $this->getFormAuthorizationHeader());
 
         $response->assertStatus(201)
             ->assertJsonStructure([
@@ -176,11 +176,11 @@ class TransactionTest extends TestCase
                 ],
             ]);
 
-        $this->assertDatabaseHas('inventories', ['code' => $response['data']['code']]);
+        $this->assertDatabaseHas('products', ['code' => $response['data']['code']]);
 
         // Create transaction
         $transData = [
-            'inventory_id' => $response['data']['id'],
+            'product_id' => $response['data']['id'],
             'quantity' => 1,
             'image' => UploadedFile::fake()->image('image.jpg'),
         ];
@@ -191,7 +191,7 @@ class TransactionTest extends TestCase
                 'status',
                 'data' => [
                     'id',
-                    'inventory_id',
+                    'product_id',
                     'code',
                     'type',
                     'price',
@@ -210,7 +210,7 @@ class TransactionTest extends TestCase
                 'status',
                 'data' => [
                     'id',
-                    'inventory_id',
+                    'product_id',
                     'code',
                     'type',
                     'price',
@@ -226,7 +226,7 @@ class TransactionTest extends TestCase
         $this->refreshDatabase();
         $this->seed();
 
-        // Create inventory
+        // Create product
         $invData = [
             'code' => $this->faker->unique()->word,
             'name' => $this->faker->name,
@@ -235,7 +235,7 @@ class TransactionTest extends TestCase
             'quantity' => $this->faker->randomNumber(2),
             'image' => UploadedFile::fake()->image('image.jpg'),
         ];
-        $response = $this->post('/api/v1/inventories', $invData, $this->getFormAuthorizationHeader());
+        $response = $this->post('/api/v1/products', $invData, $this->getFormAuthorizationHeader());
 
         $response->assertStatus(201)
             ->assertJsonStructure([
@@ -251,13 +251,13 @@ class TransactionTest extends TestCase
                 ],
             ]);
 
-        $this->assertDatabaseHas('inventories', ['code' => $response['data']['code']]);
+        $this->assertDatabaseHas('products', ['code' => $response['data']['code']]);
 
         sleep(1); // Sleep for 1 second to make sure the code is different
 
         // Create transaction
         $transData = [
-            'inventory_id' => $response['data']['id'],
+            'product_id' => $response['data']['id'],
             'quantity' => 1,
             'image' => UploadedFile::fake()->image('image.jpg'),
         ];
@@ -268,7 +268,7 @@ class TransactionTest extends TestCase
                 'status',
                 'data' => [
                     'id',
-                    'inventory_id',
+                    'product_id',
                     'code',
                     'type',
                     'price',
@@ -292,7 +292,7 @@ class TransactionTest extends TestCase
                 'status',
                 'data' => [
                     'id',
-                    'inventory_id',
+                    'product_id',
                     'code',
                     'type',
                     'price',
@@ -310,7 +310,7 @@ class TransactionTest extends TestCase
         $this->refreshDatabase();
         $this->seed();
 
-        // Create inventory
+        // Create product
         $invData = [
             'code' => $this->faker->unique()->word,
             'name' => $this->faker->name,
@@ -319,7 +319,7 @@ class TransactionTest extends TestCase
             'quantity' => $this->faker->randomNumber(2),
             'image' => UploadedFile::fake()->image('image.jpg'),
         ];
-        $response = $this->post('/api/v1/inventories', $invData, $this->getFormAuthorizationHeader());
+        $response = $this->post('/api/v1/products', $invData, $this->getFormAuthorizationHeader());
 
         $response->assertStatus(201)
             ->assertJsonStructure([
@@ -335,13 +335,13 @@ class TransactionTest extends TestCase
                 ],
             ]);
 
-        $this->assertDatabaseHas('inventories', ['code' => $response['data']['code']]);
+        $this->assertDatabaseHas('products', ['code' => $response['data']['code']]);
 
         sleep(1); // Sleep for 1 second to make sure the code is different
 
         // Create transaction
         $transData = [
-            'inventory_id' => $response['data']['id'],
+            'product_id' => $response['data']['id'],
             'quantity' => 1,
             'image' => UploadedFile::fake()->image('image.jpg'),
         ];
@@ -352,7 +352,7 @@ class TransactionTest extends TestCase
                 'status',
                 'data' => [
                     'id',
-                    'inventory_id',
+                    'product_id',
                     'code',
                     'type',
                     'price',

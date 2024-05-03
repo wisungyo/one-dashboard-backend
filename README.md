@@ -1,6 +1,6 @@
 ## About Laravel
 
-One Dashboard RESTful API to manage inventories.
+One Dashboard RESTful API to manage products.
 
 ## Requirements
 

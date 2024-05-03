@@ -566,471 +566,6 @@
                 ]
             }
         },
-        "/api/v1/inventories": {
-            "get": {
-                "tags": [
-                    "Inventory"
-                ],
-                "summary": "Get list inventories ",
-                "description": "Endpoint to get list inventories ",
-                "operationId": "425df31f832a0357248de9f6276e234f",
-                "parameters": [
-                    {
-                        "name": "category_id",
-                        "in": "query",
-                        "description": "Categoy ID"
-                    },
-                    {
-                        "name": "code",
-                        "in": "query",
-                        "description": "Code"
-                    },
-                    {
-                        "name": "name",
-                        "in": "query",
-                        "description": "name"
-                    },
-                    {
-                        "name": "description",
-                        "in": "query",
-                        "description": "Description"
-                    },
-                    {
-                        "name": "price",
-                        "in": "query",
-                        "description": "Price"
-                    },
-                    {
-                        "name": "quantity",
-                        "in": "query",
-                        "description": "Quantity"
-                    },
-                    {
-                        "name": "sort",
-                        "in": "query",
-                        "description": "1 for Ascending -1 for Descending"
-                    },
-                    {
-                        "name": "sort_by",
-                        "in": "query",
-                        "description": "Field to sort"
-                    },
-                    {
-                        "name": "limit",
-                        "in": "query",
-                        "description": "Limit (Default 10)"
-                    },
-                    {
-                        "name": "page",
-                        "in": "query",
-                        "description": "Num Of Page"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Get list inventories successfully",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "data": {
-                                            "type": "object",
-                                            "example": []
-                                        },
-                                        "pagination": {
-                                            "type": "object",
-                                            "example": []
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Get list inventories failed",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "status": {
-                                            "type": "boolean",
-                                            "example": false
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Get list inventories failed"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "token": []
-                    }
-                ]
-            },
-            "post": {
-                "tags": [
-                    "Inventory"
-                ],
-                "summary": "Create a new inventory",
-                "description": "Create a new inventory",
-                "operationId": "348b35e68aba99e48dc5d67f988ad338",
-                "requestBody": {
-                    "content": {
-                        "multipart/form-data": {
-                            "schema": {
-                                "required": [
-                                    "category_id",
-                                    "code",
-                                    "name",
-                                    "price",
-                                    "quantity",
-                                    "image"
-                                ],
-                                "properties": {
-                                    "category_id": {
-                                        "type": "number",
-                                        "example": 1
-                                    },
-                                    "code": {
-                                        "type": "string",
-                                        "example": "INV1X"
-                                    },
-                                    "name": {
-                                        "type": "string",
-                                        "example": "Choki-Choki"
-                                    },
-                                    "description": {
-                                        "type": "string",
-                                        "example": "Chocolate wafer"
-                                    },
-                                    "price": {
-                                        "type": "number",
-                                        "example": 10000
-                                    },
-                                    "quantity": {
-                                        "type": "number",
-                                        "example": 15
-                                    },
-                                    "image": {
-                                        "type": "file"
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "201": {
-                        "description": "Create a new inventory successfully",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "status": {
-                                            "type": "boolean",
-                                            "example": true
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Create a new inventory successfully"
-                                        },
-                                        "data": {
-                                            "type": "object",
-                                            "example": []
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "422": {
-                        "description": "Wrong credentials response",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "message": {
-                                            "type": "string",
-                                            "example": "The given data was invalid."
-                                        },
-                                        "errors": {
-                                            "type": "object",
-                                            "example": []
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Create a new inventory failed"
-                    }
-                },
-                "security": [
-                    {
-                        "token": []
-                    }
-                ]
-            }
-        },
-        "/api/v1/inventories/{id}": {
-            "get": {
-                "tags": [
-                    "Inventory"
-                ],
-                "summary": "Get detail inventory",
-                "description": "Endpoint to get detail inventory",
-                "operationId": "f7934cf17cad7bf7c338d1fbfeb9a074",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "description": "ID",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Get inventory successfully",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "status": {
-                                            "type": "boolean",
-                                            "example": true
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Get inventory successfully"
-                                        },
-                                        "data": {
-                                            "type": "object",
-                                            "example": []
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Inventory not found",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "status": {
-                                            "type": "boolean",
-                                            "example": false
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Inventory not found"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "token": []
-                    }
-                ]
-            },
-            "post": {
-                "tags": [
-                    "Inventory"
-                ],
-                "summary": "Update inventory",
-                "description": "Endpoint to update inventory",
-                "operationId": "a8d85660d3d93922ebebbe5bc6b8db9e",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "description": "ID",
-                        "required": true
-                    }
-                ],
-                "requestBody": {
-                    "content": {
-                        "multipart/form-data": {
-                            "schema": {
-                                "required": [
-                                    "category_id",
-                                    "code",
-                                    "name",
-                                    "price",
-                                    "quantity"
-                                ],
-                                "properties": {
-                                    "category_id": {
-                                        "type": "number",
-                                        "example": 1
-                                    },
-                                    "code": {
-                                        "type": "string",
-                                        "example": "INV1X"
-                                    },
-                                    "name": {
-                                        "type": "string",
-                                        "example": "Choki-Choki"
-                                    },
-                                    "description": {
-                                        "type": "string",
-                                        "example": "Chocolate wafer"
-                                    },
-                                    "price": {
-                                        "type": "number",
-                                        "example": 10000
-                                    },
-                                    "quantity": {
-                                        "type": "number",
-                                        "example": 15
-                                    },
-                                    "image": {
-                                        "type": "file"
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Update inventory successfully",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "status": {
-                                            "type": "boolean",
-                                            "example": true
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Update inventory successfully"
-                                        },
-                                        "data": {
-                                            "type": "object",
-                                            "example": []
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Update inventory failed",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "status": {
-                                            "type": "boolean",
-                                            "example": false
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Update inventory failed"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "token": []
-                    }
-                ]
-            },
-            "delete": {
-                "tags": [
-                    "Inventory"
-                ],
-                "summary": "Delete inventory",
-                "description": "Endpoint to delete inventory",
-                "operationId": "f868943ab2032cb40d470cd2a723f940",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "description": "ID",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Delete inventory successfully",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "status": {
-                                            "type": "boolean",
-                                            "example": true
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Delete inventory successfully"
-                                        },
-                                        "data": {
-                                            "type": "object",
-                                            "example": []
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Inventory not found",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "status": {
-                                            "type": "boolean",
-                                            "example": false
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Inventory not found"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "token": []
-                    }
-                ]
-            }
-        },
         "/api/v1/predictions": {
             "get": {
                 "tags": [
@@ -1091,6 +626,471 @@
                                         "message": {
                                             "type": "string",
                                             "example": "Get prediction value failed"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "token": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/products": {
+            "get": {
+                "tags": [
+                    "Product"
+                ],
+                "summary": "Get list products ",
+                "description": "Endpoint to get list products ",
+                "operationId": "1ce27f90dd8c39cea9520bf45d58c7c2",
+                "parameters": [
+                    {
+                        "name": "category_id",
+                        "in": "query",
+                        "description": "Categoy ID"
+                    },
+                    {
+                        "name": "code",
+                        "in": "query",
+                        "description": "Code"
+                    },
+                    {
+                        "name": "name",
+                        "in": "query",
+                        "description": "name"
+                    },
+                    {
+                        "name": "description",
+                        "in": "query",
+                        "description": "Description"
+                    },
+                    {
+                        "name": "price",
+                        "in": "query",
+                        "description": "Price"
+                    },
+                    {
+                        "name": "quantity",
+                        "in": "query",
+                        "description": "Quantity"
+                    },
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "description": "1 for Ascending -1 for Descending"
+                    },
+                    {
+                        "name": "sort_by",
+                        "in": "query",
+                        "description": "Field to sort"
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Limit (Default 10)"
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Num Of Page"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Get list products successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "example": []
+                                        },
+                                        "pagination": {
+                                            "type": "object",
+                                            "example": []
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Get list products failed",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Get list products failed"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "token": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Product"
+                ],
+                "summary": "Create a new product",
+                "description": "Create a new product",
+                "operationId": "acaa0d3fdc74fd4b534e70fc016cf7f1",
+                "requestBody": {
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "category_id",
+                                    "code",
+                                    "name",
+                                    "price",
+                                    "quantity",
+                                    "image"
+                                ],
+                                "properties": {
+                                    "category_id": {
+                                        "type": "number",
+                                        "example": 1
+                                    },
+                                    "code": {
+                                        "type": "string",
+                                        "example": "INV1X"
+                                    },
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Choki-Choki"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Chocolate wafer"
+                                    },
+                                    "price": {
+                                        "type": "number",
+                                        "example": 10000
+                                    },
+                                    "quantity": {
+                                        "type": "number",
+                                        "example": 15
+                                    },
+                                    "image": {
+                                        "type": "file"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Create a new product successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Create a new product successfully"
+                                        },
+                                        "data": {
+                                            "type": "object",
+                                            "example": []
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Wrong credentials response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "The given data was invalid."
+                                        },
+                                        "errors": {
+                                            "type": "object",
+                                            "example": []
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Create a new product failed"
+                    }
+                },
+                "security": [
+                    {
+                        "token": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/products/{id}": {
+            "get": {
+                "tags": [
+                    "Product"
+                ],
+                "summary": "Get detail product",
+                "description": "Endpoint to get detail product",
+                "operationId": "249e765b6489191fb8167474db8867f7",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Get product successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Get product successfully"
+                                        },
+                                        "data": {
+                                            "type": "object",
+                                            "example": []
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Product not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Product not found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "token": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Product"
+                ],
+                "summary": "Update product",
+                "description": "Endpoint to update product",
+                "operationId": "28e5087618b9b042d3e04e3f62db2d0f",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID",
+                        "required": true
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "category_id",
+                                    "code",
+                                    "name",
+                                    "price",
+                                    "quantity"
+                                ],
+                                "properties": {
+                                    "category_id": {
+                                        "type": "number",
+                                        "example": 1
+                                    },
+                                    "code": {
+                                        "type": "string",
+                                        "example": "INV1X"
+                                    },
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Choki-Choki"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Chocolate wafer"
+                                    },
+                                    "price": {
+                                        "type": "number",
+                                        "example": 10000
+                                    },
+                                    "quantity": {
+                                        "type": "number",
+                                        "example": 15
+                                    },
+                                    "image": {
+                                        "type": "file"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Update product successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Update product successfully"
+                                        },
+                                        "data": {
+                                            "type": "object",
+                                            "example": []
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Update product failed",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Update product failed"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "token": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Product"
+                ],
+                "summary": "Delete product",
+                "description": "Endpoint to delete product",
+                "operationId": "cc01048629edd9759ba1d7ffc989f667",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Delete product successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Delete product successfully"
+                                        },
+                                        "data": {
+                                            "type": "object",
+                                            "example": []
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Product not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Product not found"
                                         }
                                     },
                                     "type": "object"
@@ -1429,9 +1429,9 @@
                         "description": "Category ID"
                     },
                     {
-                        "name": "inventory_id",
+                        "name": "product_id",
                         "in": "query",
-                        "description": "Inventory ID"
+                        "description": "Product ID"
                     },
                     {
                         "name": "code",
@@ -1586,12 +1586,12 @@
                                         "type": "array",
                                         "items": {
                                             "required": [
-                                                "inventory_id",
+                                                "product_id",
                                                 "quantity"
                                             ],
                                             "properties": {
-                                                "inventory_id": {
-                                                    "description": "Inventory ID",
+                                                "product_id": {
+                                                    "description": "Product ID",
                                                     "type": "integer",
                                                     "example": 1
                                                 },

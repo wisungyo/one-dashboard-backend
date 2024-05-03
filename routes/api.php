@@ -2,8 +2,8 @@
 
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\CategoryController;
-use App\Http\Controllers\Api\V1\InventoryController;
 use App\Http\Controllers\Api\V1\PredictionController;
+use App\Http\Controllers\Api\V1\ProductController;
 use App\Http\Controllers\Api\V1\ProfileController;
 use App\Http\Controllers\Api\V1\SettingController;
 use App\Http\Controllers\Api\V1\TransactionController;
@@ -28,9 +28,9 @@ Route::name('api.v1.')
             // Category
             Route::resource('categories', CategoryController::class);
 
-            // Inventory
-            Route::resource('inventories', InventoryController::class)->only(['index', 'store', 'show', 'destroy']);
-            Route::post('/inventories/{id}', [InventoryController::class, 'update'])->name('inventories.update');
+            // Product
+            Route::resource('products', ProductController::class)->only(['index', 'store', 'show', 'destroy']);
+            Route::post('/products/{id}', [ProductController::class, 'update'])->name('products.update');
 
             // Transaction
             Route::resource('transactions', TransactionController::class)->only(['index', 'store', 'show']);

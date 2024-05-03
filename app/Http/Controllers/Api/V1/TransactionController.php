@@ -28,9 +28,9 @@ class TransactionController extends Controller
      *           description="Category ID"
      *       ),
      *       @OA\Parameter(
-     *           name="inventory_id",
+     *           name="product_id",
      *           in="query",
-     *           description="Inventory ID"
+     *           description="Product ID"
      *       ),
      *       @OA\Parameter(
      *           name="code",
@@ -166,9 +166,9 @@ class TransactionController extends Controller
      *
      *                   @OA\Items(
      *                      type="object",
-     *                      required={"inventory_id", "quantity"},
+     *                      required={"product_id", "quantity"},
      *
-     *                      @OA\Property(property="inventory_id", type="integer", description="Inventory ID", example=1),
+     *                      @OA\Property(property="product_id", type="integer", description="Product ID", example=1),
      *                      @OA\Property(property="quantity", type="integer", description="Quantity of the item", example=1),
      *                      @OA\Property(property="note", type="string", description="Note of the item", example="Buy some items"),
      *                  ),
