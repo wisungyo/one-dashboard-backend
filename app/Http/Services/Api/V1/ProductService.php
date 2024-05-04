@@ -74,14 +74,15 @@ class ProductService extends BaseResponse
                 'total_quantity' => $product->quantity,
                 'note' => 'Create product', // 'Add product
                 'created_by' => auth()->id(),
+                'items' => [
+                    [
+                        'product_id' => $product->id,
+                        'price' => $product->price,
+                        'quantity' => $product->quantity,
+                        'total' => $product->price * $product->quantity,
+                    ],
+                ]
             ];
-            $trxData['items'] = [];
-            array_push($trxData['items'], [
-                'product_id' => $product->id,
-                'price' => $product->price,
-                'quantity' => $product->quantity,
-                'total' => $product->price * $product->quantity,
-            ]);
             $trxResp = TransactionService::store($trxData);
             if (isset($trxResp['status']) && ! $trxResp['status']) {
                 DB::rollBack();
@@ -152,12 +153,14 @@ class ProductService extends BaseResponse
                 'total_quantity' => $diffQuantity,
                 'note' => 'Update product', // 'Update product
                 'created_by' => auth()->id(),
-            ];
-            $trxItemData[] = [
-                'product_id' => $product->id,
-                'price' => $diffPrice,
-                'quantity' => $diffQuantity,
-                'total' => $diffTotalAmount,
+                'items' => [
+                    [
+                        'product_id' => $product->id,
+                        'price' => $diffPrice,
+                        'quantity' => $diffQuantity,
+                        'total' => $diffTotalAmount,
+                    ],
+                ]
             ];
             $trxResp = TransactionService::store($trxData);
             if (isset($trxResp['status']) && ! $trxResp['status']) {
