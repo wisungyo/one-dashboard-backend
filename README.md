@@ -42,4 +42,5 @@ One Dashboard RESTful API to manage products.
 
 ## Note
 
+- For generate dummy data (exclude user and category) like Products, Transactions, Expenses and Incomes: Run `php artisan db:seed ProductTransactionSeeder`
 - Open [{BASE_URL}/api/v1/documentation](http://localhost:8080/api/v1/documentation) to view the API Documentation (Swagger)
