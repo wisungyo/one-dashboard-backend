@@ -23,6 +23,8 @@ class ProductResource extends JsonResource
             'quantity' => $this->quantity,
             'total' => number_format($this->price * $this->quantity, 2, '.', ''),
             'category' => new CategoryResource($this->category),
+            'created_at' => $this->created_at->format('Y-m-d H:i:s'),
+            'updated_at' => $this->updated_at->format('Y-m-d H:i:s'),
             'image' => new ImageResource($this->image),
         ];
     }

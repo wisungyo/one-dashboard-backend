@@ -24,6 +24,8 @@ class TransactionResource extends JsonResource
             'customer_phone' => $this->customer_phone,
             'customer_address' => $this->customer_address,
             'note' => $this->note,
+            'created_at' => $this->created_at->format('Y-m-d H:i:s'),
+            'updated_at' => $this->updated_at->format('Y-m-d H:i:s'),
             'items' => TransactionItemResource::collection($this->items),
         ];
     }

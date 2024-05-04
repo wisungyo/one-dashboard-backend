@@ -10,6 +10,7 @@ use App\Http\Filters\Api\V1\ByCustomerAddress;
 use App\Http\Filters\Api\V1\ByCustomerName;
 use App\Http\Filters\Api\V1\ByCustomerPhone;
 use App\Http\Filters\Api\V1\ByNote;
+use App\Http\Filters\Api\V1\ByRangeCreatedAt;
 use App\Http\Filters\Api\V1\ByTotalItem;
 use App\Http\Filters\Api\V1\ByTotalPrice;
 use App\Http\Filters\Api\V1\ByTotalQuantity;
@@ -32,6 +33,13 @@ class TransactionService extends BaseResponse
     public function list(Request $request)
     {
         try {
+            // Formatting start and end date
+            if ($request->has('start_date')) {
+                $request->merge(['start_date' => date('Y-m-d', strtotime($request->start_date))]);
+            }
+            if ($request->has('end_date')) {
+                $request->merge(['end_date' => date('Y-m-d', strtotime($request->end_date))]);
+            }
             $query = Transaction::query();
             $piplines = [
                 HasItemsProductCategoryId::class,
@@ -45,6 +53,7 @@ class TransactionService extends BaseResponse
                 ByCustomerPhone::class,
                 ByCustomerAddress::class,
                 ByNote::class,
+                ByRangeCreatedAt::class,
                 OrderBy::class,
             ];
 
@@ -88,13 +97,15 @@ class TransactionService extends BaseResponse
                 $totalItem++;
                 $totalPrice += $product->price * $item['quantity'];
 
-                array_push($data['items'], [
+                $data['items'][] = [
                     'product_id' => $product->id,
                     'price' => $product->price,
                     'quantity' => $item['quantity'],
                     'total' => $product->price * $item['quantity'],
                     'note' => isset($item['note']) ? $item['note'] : null,
-                ]);
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ];
             }
 
             $data['total_item'] = $totalItem;

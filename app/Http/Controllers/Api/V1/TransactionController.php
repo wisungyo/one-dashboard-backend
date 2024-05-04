@@ -78,6 +78,16 @@ class TransactionController extends Controller
      *           description="Note"
      *       ),
      *       @OA\Parameter(
+     *           name="start_date",
+     *           in="query",
+     *           description="Start Date"
+     *       ),
+     *       @OA\Parameter(
+     *           name="end_date",
+     *           in="query",
+     *           description="End Date"
+     *       ),
+     *       @OA\Parameter(
      *           name="sort",
      *           in="query",
      *           description="1 for Ascending -1 for Descending"

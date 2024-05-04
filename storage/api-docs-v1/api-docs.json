@@ -1479,6 +1479,16 @@
                         "description": "Note"
                     },
                     {
+                        "name": "start_date",
+                        "in": "query",
+                        "description": "Start Date"
+                    },
+                    {
+                        "name": "end_date",
+                        "in": "query",
+                        "description": "End Date"
+                    },
+                    {
                         "name": "sort",
                         "in": "query",
                         "description": "1 for Ascending -1 for Descending"
