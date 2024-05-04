@@ -195,8 +195,10 @@ class ProductService extends BaseResponse
             $product->delete();
 
             // Recalculate expense
-            $totalRemain = $product->price * $product->quantity;
-            $expense = ExpenseService::calculate(null, ExpenseType::REMOVE, $totalRemain);
+            $totalItem = 1;
+            $totalRemainQuantity = $product->quantity;
+            $totalRemainAmount = $product->price * $product->quantity;
+            $expense = ExpenseService::calculate(null, ExpenseType::REMOVE, $totalItem, $totalRemainQuantity, $totalRemainAmount);
             if (! $expense['status']) {
                 DB::rollBack();
                 Log::error($expense['message']);
@@ -213,5 +215,38 @@ class ProductService extends BaseResponse
         }
 
         return $this->responseSuccess('Product has been deleted successfully.', 200);
+    }
+
+    public function mostSold($request, $limit = 5)
+    {
+        try {
+            $products = Product::with(['transactionItems', 'transactionItems.transaction'])
+                ->whereHas('transactionItems', function ($query) use ($request) {
+                    $query->whereBetween('created_at', [$request->start_date, $request->end_date])->whereHas('transaction', function ($query) {
+                        $query->where('type', TransactionType::OUT);
+                    });
+                })
+                ->get()
+                ->sortByDesc(function ($product) {
+                    return $product->transactionItems->sum('quantity');
+                })
+                ->take($limit);
+
+            $data = [];
+            foreach ($products as $product) {
+                $quantity = $product->transactionItems->sum('quantity');
+                $data[] = [
+                    'product' => new ProductResource($product),
+                    'total_sold' => $quantity,
+                    'total_price' => $product->price * $quantity,
+                ];
+            }
+
+            return $this->responseSuccess('Most sold products.', 200, $data);
+        } catch (\Throwable $th) {
+            Log::error($th);
+
+            return $this->responseError(__('Failed get most sold products'), 500, $th->getMessage());
+        }
     }
 }

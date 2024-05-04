@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('name');
             $table->text('description')->nullable();
             $table->float('price', 10, 2);
-            $table->tinyInteger('quantity');
+            $table->integer('quantity');
             $table->foreignId('created_by')->constrained('users');
             $table->timestamps();
             $table->softDeletes();

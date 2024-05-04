@@ -16,8 +16,8 @@ return new class extends Migration
             $table->id();
             $table->string('code')->unique();
             $table->enum('type', TransactionType::toArray())->default(TransactionType::OUT);
-            $table->tinyInteger('total_item');
-            $table->tinyInteger('total_quantity');
+            $table->integer('total_item');
+            $table->integer('total_quantity');
             $table->float('total_price', 10, 2);
             $table->string('customer_name')->nullable();
             $table->string('customer_phone')->nullable();

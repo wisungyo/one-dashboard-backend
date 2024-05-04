@@ -14,6 +14,8 @@ return new class extends Migration
         Schema::create('incomes', function (Blueprint $table) {
             $table->id();
             $table->date('date');
+            $table->integer('total_item');
+            $table->integer('total_quantity');
             $table->float('amount', 10, 2);
             $table->foreignId('created_by')->constrained('users');
             $table->timestamps();

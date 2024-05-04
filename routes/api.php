@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\CategoryController;
+use App\Http\Controllers\Api\V1\DashboardController;
 use App\Http\Controllers\Api\V1\ExpenseController;
 use App\Http\Controllers\Api\V1\IncomeController;
 use App\Http\Controllers\Api\V1\PredictionController;
@@ -42,6 +43,13 @@ Route::name('api.v1.')
 
             // Income
             Route::resource('incomes', IncomeController::class)->only(['index', 'show']);
+
+            // Dashboard
+            Route::controller(DashboardController::class)->prefix('dashboard')->name('dashboard.')->group(function () {
+                Route::get('sales-summary', 'salesSummary')->name('sales-summary');
+                Route::get('most-sold-products', 'mostSoldProducts')->name('most-sold-products');
+                Route::get('most-sold-categories', 'mostSoldCategories')->name('most-sold-categories');
+            });
 
             // Profile
             Route::controller(ProfileController::class)->prefix('profile')->name('profile.')->group(function () {

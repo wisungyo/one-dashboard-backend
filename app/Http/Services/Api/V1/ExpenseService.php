@@ -54,12 +54,12 @@ class ExpenseService extends BaseResponse
         return $this->responseSuccess('Expense found.', 200, $resource);
     }
 
-    public function calculate($transaction = null, $type = ExpenseType::ADD, $amount = 0)
+    public function calculate($transaction = null, $type = ExpenseType::ADD, $totalItem = 0, $amount = 0, $quantity = 0)
     {
         $statusCode = 200;
         try {
             if ((is_null($transaction) && $type == ExpenseType::ADD) ||
-                (in_array($type, [ExpenseType::UPDATE, ExpenseType::REMOVE]) && $amount == 0)
+                (in_array($type, [ExpenseType::UPDATE, ExpenseType::REMOVE]) && $totalItem == 0 && $amount == 0 && $quantity == 0)
             ) {
                 Log::error("Can't update expense without transaction data.");
 
@@ -71,8 +71,12 @@ class ExpenseService extends BaseResponse
                 'created_by' => auth()->id(),
             ];
             if ($type == ExpenseType::ADD) {
+                $data['total_item'] = $transaction->total_item;
+                $data['total_quantity'] = $transaction->total_quantity;
                 $data['amount'] = $transaction->total_price;
             } else {
+                $data['total_item'] = $totalItem;
+                $data['total_quantity'] = $quantity;
                 $data['amount'] = $amount;
             }
 
@@ -80,13 +84,19 @@ class ExpenseService extends BaseResponse
 
             if ($expense) {
                 if (in_array($type, [ExpenseType::ADD, ExpenseType::UPDATE])) {
+                    $expense->total_item += $data['total_item'];
+                    $expense->total_quantity += $data['total_quantity'];
                     $expense->amount += $data['amount'];
                 } else {
+                    $expense->total_item -= $data['total_item'];
+                    $expense->total_quantity -= $data['total_quantity'];
                     $expense->amount -= $data['amount'];
                 }
                 $expense->save();
             } else {
                 $statusCode = 201;
+                $data['total_item'] = $type == ExpenseType::ADD ? $data['total_item'] : -$data['total_item'];
+                $data['total_quantity'] = $type == ExpenseType::ADD ? $data['total_quantity'] : -$data['total_quantity'];
                 $data['amount'] = $type == ExpenseType::ADD ? $data['amount'] : -$data['amount'];
                 $expense = Expense::create($data);
             }

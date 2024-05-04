@@ -116,4 +116,53 @@ class CategoryService extends BaseResponse
 
         return $this->responseSuccess('Category has been deleted successfully.', 200);
     }
+
+    public function mostSold($request)
+    {
+        try {
+            $categories = Category::with(['products.transactionItems'])
+                ->get()
+                ->map(function ($category) {
+                    $totalSold = 0;
+                    $category->products->each(function ($product) use (&$totalSold) {
+                        $product->transactionItems->each(function ($transactionItem) use (&$totalSold) {
+                            $totalSold += $transactionItem->quantity;
+                        });
+                    });
+
+                    return [
+                        'id' => $category->id,
+                        'name' => $category->name,
+                        'description' => $category->description,
+                        'total_sold' => $totalSold,
+                    ];
+                })
+                ->sortByDesc('total_sold');
+
+            $totalAllSold = $categories->sum('total_sold');
+            $totalCategories = $categories->count();
+            $data = [
+                'total_categories' => $totalCategories,
+                'total_sold' => $totalAllSold,
+                'items' => [],
+            ];
+            // Mapping data items with the percentage of sold
+            $categories->each(function ($category) use ($totalAllSold, &$data) {
+                $percentage = $category['total_sold'] / $totalAllSold * 100;
+                $data['items'][] = [
+                    'id' => $category['id'],
+                    'name' => $category['name'],
+                    'description' => $category['description'],
+                    'total_sold' => $category['total_sold'],
+                    'percentage' => round($percentage, 2),
+                ];
+            });
+
+            return $this->responseSuccess(__('Get most sold categories successfully'), 200, $data);
+        } catch (\Throwable $th) {
+            Log::error($th);
+
+            return $this->responseError(__('Failed get most sold categories'), 500, $th->getMessage());
+        }
+    }
 }

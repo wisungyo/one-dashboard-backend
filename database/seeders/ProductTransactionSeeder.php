@@ -42,8 +42,12 @@ class ProductTransactionSeeder extends Seeder
                     ]
                 );
 
+                $totalItem = 0;
+                $totalQuantity = 0;
                 $totalAmount = 0;
                 foreach ($products as $product) {
+                    $totalItem++;
+                    $totalQuantity += $product->quantity;
                     $totalAmount += $product->price * $product->quantity;
 
                     $inTransaction = [
@@ -80,6 +84,8 @@ class ProductTransactionSeeder extends Seeder
 
                 $expenses[] = [
                     'date' => $date,
+                    'total_item' => $totalItem,
+                    'total_quantity' => $totalQuantity,
                     'amount' => $totalAmount,
                     'created_at' => $date,
                     'updated_at' => $date,
@@ -97,6 +103,8 @@ class ProductTransactionSeeder extends Seeder
 
                     $quantity = round($product->quantity / $totalMonth);
                     $diffQuantity = $product->quantity - $quantity;
+                    $totalItem = 1;
+                    $totalQuantity = $quantity;
                     $totalPrice = $product->price * $quantity;
 
                     $outTransaction = [
@@ -134,12 +142,16 @@ class ProductTransactionSeeder extends Seeder
                     if (! isset($incomes[$dateFormat])) {
                         $incomes[$dateFormat] = [
                             'date' => $date,
+                            'total_item' => $totalItem,
+                            'total_quantity' => $totalQuantity,
                             'amount' => $totalPrice,
                             'created_at' => $date,
                             'updated_at' => $date,
                             'created_by' => 1,
                         ];
                     } else {
+                        $incomes[$dateFormat]['total_item'] += $totalItem;
+                        $incomes[$dateFormat]['total_quantity'] += $totalQuantity;
                         $incomes[$dateFormat]['amount'] += $totalPrice;
                     }
 

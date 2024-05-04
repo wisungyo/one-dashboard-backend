@@ -54,6 +54,21 @@ class BaseResponse
     }
 
     /**
+     * Filter Pipeline
+     *
+     * @param  object  $query
+     * @param  array  $piplines
+     * @param  object  $request
+     * @return object
+     */
+    protected function filterPipeline($query, $piplines, $request)
+    {
+        return \Illuminate\Support\Facades\Pipeline::send($query)
+            ->through($piplines)
+            ->thenReturn();
+    }
+
+    /**
      * Filter List with Pagination
      *
      * @param  object  $obj
@@ -68,9 +83,7 @@ class BaseResponse
         $request->sort = $request->sort ?? -1;
 
         // Filter process
-        $data = \Illuminate\Support\Facades\Pipeline::send($query)
-            ->through($piplines)
-            ->thenReturn();
+        $data = $this->filterPipeline($query, $piplines, $request);
 
         return $data->paginate($limit)->appends($request->input());
     }

@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Log;
 
 class IncomeService extends BaseResponse
 {
-    public function list(Request $request)
+    public function list(Request $request, $isPagination = true)
     {
         try {
             // Formatting start and end date
@@ -32,6 +32,14 @@ class IncomeService extends BaseResponse
                 ByRangeDate::class,
                 OrderBy::class,
             ];
+
+            if (! $isPagination) {
+                $filter = $this->filterPipeline($query, $piplines, $request);
+                $data = $filter->get();
+                $resources = IncomeResource::collection($data);
+
+                return $this->responseSuccess('Success get incomes.', 200, $resources);
+            }
 
             $data = $this->filterPagination($query, $piplines, $request);
 
@@ -55,12 +63,12 @@ class IncomeService extends BaseResponse
         return $this->responseSuccess('Income found.', 200, $resource);
     }
 
-    public function calculate($transaction = null, $type = IncomeType::ADD, $amount = 0)
+    public function calculate($transaction = null, $type = IncomeType::ADD, $totalItem = 0, $amount = 0, $quantity = 0)
     {
         $statusCode = 200;
         try {
             if ((is_null($transaction) && $type == IncomeType::ADD) ||
-                (in_array($type, [IncomeType::UPDATE, IncomeType::REMOVE]) && $amount == 0)
+                (in_array($type, [IncomeType::UPDATE, IncomeType::REMOVE]) && $totalItem == 0 && $amount == 0 && $quantity == 0)
             ) {
                 Log::error("Can't update income without transaction data.");
 
@@ -78,8 +86,12 @@ class IncomeService extends BaseResponse
                 'created_by' => auth()->id(),
             ];
             if ($type == IncomeType::ADD) {
+                $data['total_item'] = $transaction->total_item;
+                $data['total_quantity'] = $transaction->total_quantity;
                 $data['amount'] = $transaction->total_price;
             } else {
+                $data['total_item'] = $totalItem;
+                $data['total_quantity'] = $quantity;
                 $data['amount'] = $amount;
             }
 
@@ -87,13 +99,19 @@ class IncomeService extends BaseResponse
 
             if ($income) {
                 if (in_array($type, [IncomeType::ADD, IncomeType::UPDATE])) {
+                    $income->total_item += $data['total_item'];
+                    $income->total_quantity += $data['total_quantity'];
                     $income->amount += $data['amount'];
                 } else {
+                    $income->total_item -= $data['total_item'];
+                    $income->total_quantity -= $data['total_quantity'];
                     $income->amount -= $data['amount'];
                 }
                 $income->save();
             } else {
                 $statusCode = 201;
+                $data['total_item'] = $type == IncomeType::ADD ? $data['total_item'] : -$data['total_item'];
+                $data['total_quantity'] = $type == IncomeType::ADD ? $data['total_quantity'] : -$data['total_quantity'];
                 $data['amount'] = $type == IncomeType::ADD ? $data['amount'] : -$data['amount'];
                 $income = Income::create($data);
             }

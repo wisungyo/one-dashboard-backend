@@ -13,6 +13,8 @@ class Income extends Model
 
     protected $fillable = [
         'date',
+        'total_item',
+        'total_quantity',
         'amount',
         'created_by',
     ];

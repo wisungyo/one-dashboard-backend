@@ -43,9 +43,9 @@ class Product extends Model
         return $this->belongsTo(User::class, 'created_by');
     }
 
-    public function transactions(): HasMany
+    public function transactionItems(): HasMany
     {
-        return $this->hasMany(Transaction::class);
+        return $this->hasMany(TransactionItem::class);
     }
 
     public function images(): MorphMany

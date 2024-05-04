@@ -17,6 +17,8 @@ class IncomeResource extends JsonResource
         return [
             'id' => $this->id,
             'date' => $this->date,
+            'total_item' => $this->total_item,
+            'total_quantity' => $this->total_quantity,
             'amount' => $this->amount,
             'created_at' => $this->created_at->format('Y-m-d H:i:s'),
             'updated_at' => $this->updated_at->format('Y-m-d H:i:s'),

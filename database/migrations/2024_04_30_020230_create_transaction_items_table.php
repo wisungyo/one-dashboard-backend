@@ -18,7 +18,7 @@ return new class extends Migration
             $table->foreignIdFor(Transaction::class);
             $table->foreignIdFor(Product::class);
             $table->float('price', 10, 2);
-            $table->tinyInteger('quantity');
+            $table->integer('quantity');
             $table->float('total', 10, 2);
             $table->text('note')->nullable();
             $table->timestamps();
