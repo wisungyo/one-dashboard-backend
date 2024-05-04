@@ -3,12 +3,57 @@
 namespace App\Http\Services\Api\V1;
 
 use App\Enums\ExpenseType;
+use App\Http\Filters\Api\V1\ByAmount;
+use App\Http\Filters\Api\V1\ByDate;
+use App\Http\Filters\Api\V1\ByRangeDate;
+use App\Http\Filters\Api\V1\OrderBy;
 use App\Http\Resources\Api\V1\ExpenseResource;
 use App\Models\Expense;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
 class ExpenseService extends BaseResponse
 {
+    public function list(Request $request)
+    {
+        try {
+            // Formatting start and end date
+            if ($request->has('start_date')) {
+                $request->merge(['start_date' => date('Y-m-d', strtotime($request->start_date))]);
+            }
+            if ($request->has('end_date')) {
+                $request->merge(['end_date' => date('Y-m-d', strtotime($request->end_date))]);
+            }
+            $query = Expense::query();
+            $piplines = [
+                ByDate::class,
+                ByAmount::class,
+                ByRangeDate::class,
+                OrderBy::class,
+            ];
+
+            $data = $this->filterPagination($query, $piplines, $request);
+
+            return ExpenseResource::collection($data);
+        } catch (\Throwable $th) {
+            Log::error($th);
+
+            return $this->responseError(__('Failed get expenses'), $th->getMessage());
+        }
+    }
+
+    public function getById($id)
+    {
+        $expense = Expense::find($id);
+        if (! $expense) {
+            return $this->responseError('Expense not found.', 404);
+        }
+
+        $resource = new ExpenseResource($expense);
+
+        return $this->responseSuccess('Expense found.', 200, $resource);
+    }
+
     public function calculate($transaction = null, $type = ExpenseType::ADD, $amount = 0)
     {
         $statusCode = 200;

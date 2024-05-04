@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\CategoryController;
+use App\Http\Controllers\Api\V1\ExpenseController;
+use App\Http\Controllers\Api\V1\IncomeController;
 use App\Http\Controllers\Api\V1\PredictionController;
 use App\Http\Controllers\Api\V1\ProductController;
 use App\Http\Controllers\Api\V1\ProfileController;
@@ -34,6 +36,12 @@ Route::name('api.v1.')
 
             // Transaction
             Route::resource('transactions', TransactionController::class)->only(['index', 'store', 'show']);
+
+            // Expense
+            Route::resource('expenses', ExpenseController::class)->only(['index', 'show']);
+
+            // Income
+            Route::resource('incomes', IncomeController::class)->only(['index', 'show']);
 
             // Profile
             Route::controller(ProfileController::class)->prefix('profile')->name('profile.')->group(function () {

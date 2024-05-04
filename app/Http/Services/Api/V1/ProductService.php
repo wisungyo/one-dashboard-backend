@@ -81,7 +81,7 @@ class ProductService extends BaseResponse
                         'quantity' => $product->quantity,
                         'total' => $product->price * $product->quantity,
                     ],
-                ]
+                ],
             ];
             $trxResp = TransactionService::store($trxData);
             if (isset($trxResp['status']) && ! $trxResp['status']) {
@@ -160,7 +160,7 @@ class ProductService extends BaseResponse
                         'quantity' => $diffQuantity,
                         'total' => $diffTotalAmount,
                     ],
-                ]
+                ],
             ];
             $trxResp = TransactionService::store($trxData);
             if (isset($trxResp['status']) && ! $trxResp['status']) {
