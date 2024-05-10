@@ -69,6 +69,6 @@ if (! function_exists('getImageTypesValidation')) {
      */
     function getImageTypesValidation()
     {
-        return 'jpeg,bmp,png,gif,svg';
+        return 'jpg,jpeg,bmp,png,gif,svg';
     }
 }
