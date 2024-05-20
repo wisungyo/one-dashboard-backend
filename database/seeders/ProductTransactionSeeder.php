@@ -10,6 +10,7 @@ use App\Models\Transaction;
 use App\Models\TransactionItem;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class ProductTransactionSeeder extends Seeder
 {
@@ -51,7 +52,7 @@ class ProductTransactionSeeder extends Seeder
                     $totalAmount += $product->price * $product->quantity;
 
                     $inTransaction = [
-                        'code' => $product->id.'-'.now()->format('YmdHisu'),
+                        'code' => $product->id.'-'.TransactionType::IN->value.'-'.now()->format('YmdHisu'),
                         'type' => TransactionType::IN,
                         'total_item' => 1,
                         'total_quantity' => $product->quantity,
@@ -99,67 +100,99 @@ class ProductTransactionSeeder extends Seeder
             $products = Product::all();
             foreach ($products as $product) {
                 foreach (range(1, $totalMonth) as $countMonth) {
-                    $date = now()->subMonth($countMonth)->startOfMonth();
+                    $startOfMonth = now()->subMonth($countMonth)->startOfMonth();
+                    $endOfMonth = now()->subMonth($countMonth)->endOfMonth();
 
-                    $quantity = round($product->quantity / $totalMonth);
-                    $diffQuantity = $product->quantity - $quantity;
-                    $totalItem = 1;
-                    $totalQuantity = $quantity;
-                    $totalPrice = $product->price * $quantity;
+                    $date = $startOfMonth;
+                    while ($date <= $endOfMonth) {
+                        if ($product->quantity <= 0){
+                            break;
+                        }
 
-                    $outTransaction = [
-                        'code' => $product->id.'-'.now()->format('YmdHisu'),
-                        'type' => TransactionType::OUT,
-                        'total_item' => 1,
-                        'total_quantity' => $quantity,
-                        'total_price' => $totalPrice,
-                        'customer_name' => null,
-                        'customer_phone' => null,
-                        'customer_address' => null,
-                        'note' => null,
-                        'created_at' => $date,
-                        'updated_at' => $date,
-                        'created_by' => 1,
-                    ];
-                    $transaction = Transaction::create($outTransaction);
-                    $outTransaction['id'] = $transaction->id;
+                        $randomQty = random_int(0, 3);
+                        Log::info('Random qty: '.$randomQty);
+                        if ($randomQty == 0) {
+                            $date = $date->addDay();
+                            continue;
+                        }
 
-                    $item = [
-                        'transaction_id' => $transaction->id,
-                        'product_id' => $product->id,
-                        'price' => $product->price,
-                        'quantity' => $quantity,
-                        'total' => $totalPrice,
-                        'created_at' => $date,
-                        'updated_at' => $date,
-                    ];
-                    $outTransactionItems[] = $item;
-                    $outTransaction['items'][] = $item;
+                        $quantity = $randomQty;
+                        if ($product->quantity < $quantity) {
+                            $quantity = $product->quantity;
+                        }
 
-                    $outTransactions[] = $outTransaction;
+                        $diffQuantity = $product->quantity - $quantity;
+                        $totalItem = 1;
+                        $totalQuantity = $quantity;
+                        $totalPrice = $product->price * $quantity;
 
-                    $dateFormat = $date->format('Y-m-d');
-                    if (! isset($incomes[$dateFormat])) {
-                        $incomes[$dateFormat] = [
-                            'date' => $date,
-                            'total_item' => $totalItem,
-                            'total_quantity' => $totalQuantity,
-                            'amount' => $totalPrice,
+                        $outTransaction = [
+                            'code' => $product->id.'-'.TransactionType::OUT->value.'-'.now()->format('YmdHisu'),
+                            'type' => TransactionType::OUT,
+                            'total_item' => 1,
+                            'total_quantity' => $quantity,
+                            'total_price' => $totalPrice,
+                            'customer_name' => null,
+                            'customer_phone' => null,
+                            'customer_address' => null,
+                            'note' => null,
                             'created_at' => $date,
                             'updated_at' => $date,
                             'created_by' => 1,
                         ];
-                    } else {
-                        $incomes[$dateFormat]['total_item'] += $totalItem;
-                        $incomes[$dateFormat]['total_quantity'] += $totalQuantity;
-                        $incomes[$dateFormat]['amount'] += $totalPrice;
-                    }
+                        $transaction = Transaction::create($outTransaction);
+                        Log::info("created transaction: ".$transaction->id);
+                        $outTransaction['id'] = $transaction->id;
 
-                    $product->quantity = $diffQuantity;
-                    $product->save();
+                        $item = [
+                            'transaction_id' => $transaction->id,
+                            'product_id' => $product->id,
+                            'price' => $product->price,
+                            'quantity' => $quantity,
+                            'total' => $totalPrice,
+                            'created_at' => $date,
+                            'updated_at' => $date,
+                        ];
+                        $outTransactionItems[] = $item;
+                        $outTransaction['items'][] = $item;
+
+                        $outTransactions[] = $outTransaction;
+
+                        $product->quantity = $diffQuantity;
+                        $product->save();
+                        Log::info("save product: ".$product->id." qty: ".$product->quantity);
+                        
+                        $date = $date->addDay();
+                        Log::info("new date ".$date->format('Y-m-d'));
+                    }
                 }
             }
+
+            Log::info('Out transactions len: '.count($outTransactions));
             TransactionItem::insert($outTransactionItems);
+
+            foreach ($outTransactions as $outTransaction) {
+                $date = $outTransaction['created_at'];
+                $dateFormat = $date->format('Y-m-d');
+                if (! isset($incomes[$dateFormat])) {
+                    Log::info("add income: ".$dateFormat);
+                    $incomes[$dateFormat] = [
+                        'date' => $outTransaction['created_at'],
+                        'total_item' => $outTransaction['total_item'],
+                        'total_quantity' => $outTransaction['total_quantity'],
+                        'amount' => $outTransaction['total_price'],
+                        'created_at' => $outTransaction['created_at'],
+                        'updated_at' => $outTransaction['updated_at'],
+                        'created_by' => 1,
+                    ];
+                } else {
+                    Log::info("update income: ".$dateFormat);
+                    $incomes[$dateFormat]['total_item'] += $outTransaction['total_item'];
+                    $incomes[$dateFormat]['total_quantity'] += $outTransaction['total_quantity'];
+                    $incomes[$dateFormat]['amount'] += $outTransaction['total_price'];
+                }
+            }
+            Log::info('Incomes len: '.count($incomes));
             Income::insert($incomes);
 
             DB::commit();

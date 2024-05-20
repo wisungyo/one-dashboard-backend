@@ -40,6 +40,12 @@ class TransactionService extends BaseResponse
             if ($request->has('end_date')) {
                 $request->merge(['end_date' => date('Y-m-d', strtotime($request->end_date))]);
             }
+            if (!($request->has('sort_by') && $request->has('sort'))) {
+                $request->merge([
+                    'sort_by' => 'created_at',
+                    'sort' => -1,
+                ]);
+            }
             $query = Transaction::query();
             $piplines = [
                 HasItemsProductCategoryId::class,

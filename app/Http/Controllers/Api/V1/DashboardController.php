@@ -65,6 +65,8 @@ class DashboardController extends Controller
         $request->merge([
             'start_date' => $request->start_date ?? now()->subDays(30)->format('Y-m-d'),
             'end_date' => $request->end_date ?? now()->format('Y-m-d'),
+            'sort_by' => $request->sort_by ?? 'date',
+            'sort' => $request->sort ?? 1,
         ]);
 
         $data = IncomeService::list($request, false);
