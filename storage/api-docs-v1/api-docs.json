@@ -1152,6 +1152,16 @@
                         "in": "query",
                         "description": "Month",
                         "required": true
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Limit (Default 10)"
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Num Of Page"
                     }
                 ],
                 "responses": {
@@ -1161,15 +1171,11 @@
                             "application/json": {
                                 "schema": {
                                     "properties": {
-                                        "status": {
-                                            "type": "boolean",
-                                            "example": true
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Get prediction value successfully"
-                                        },
                                         "data": {
+                                            "type": "object",
+                                            "example": []
+                                        },
+                                        "pagination": {
                                             "type": "object",
                                             "example": []
                                         }

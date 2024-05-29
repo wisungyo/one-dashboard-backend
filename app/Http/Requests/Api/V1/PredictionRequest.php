@@ -24,6 +24,8 @@ class PredictionRequest extends FormRequest
         return [
             'year' => ['required', 'integer', 'min:1900', 'max:'.(date('Y'))],
             'month' => ['required', 'integer', 'min:1', 'max:12'],
+            'limit' => ['nullable', 'integer'],
+            'page' => ['nullable', 'integer'],
         ];
     }
 }

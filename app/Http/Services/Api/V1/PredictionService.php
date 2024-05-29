@@ -54,10 +54,17 @@ class PredictionService extends BaseResponse
 
     /**
      * Calculate prediction value for the next month based on the last x months
+     *
+     * @param  array  $params
      */
-    public function calculatePrediction($year, $month)
+    public function calculatePrediction($params)
     {
         try {
+            $year = $params['year'];
+            $month = $params['month'];
+            $page = intval($params['page']);
+            $limit = intval($params['limit']);
+
             // Initialize timestamp
             $latestTimestamp = strtotime("$year-$month-01");
             $firstTimestamp = strtotime('-'.self::MONTH_PERIODE.' month', $latestTimestamp);
@@ -173,10 +180,23 @@ class PredictionService extends BaseResponse
                 }
             }
 
+            // Do pagination based on limit and page for the products summary
+            $total = count($productsSummary);
+            $productsSummary = array_slice($productsSummary, ($page - 1) * $limit, $limit);
+            $paginationData = [
+                'total' => $total,
+                'total_page' => ceil($total / $limit),
+                'page' => $page,
+                'items' => $limit,
+                'limit' => $limit,
+            ];
+
+
             $resp = [
                 'latest_timestamp' => date('Y-m-d', $latestTimestamp),
                 'first_timestamp' => date('Y-m-d', $firstTimestamp),
                 'products_summary' => $productsSummary,
+                'pagination' => $paginationData,
             ];
 
             return $this->responseSuccess(__('Get prediction value successfully'), 200, $resp);

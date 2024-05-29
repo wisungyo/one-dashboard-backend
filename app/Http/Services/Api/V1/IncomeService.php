@@ -25,7 +25,7 @@ class IncomeService extends BaseResponse
             if ($request->has('end_date')) {
                 $request->merge(['end_date' => date('Y-m-d', strtotime($request->end_date))]);
             }
-            if (!($request->has('sort_by') && $request->has('sort'))) {
+            if (! ($request->has('sort_by') && $request->has('sort'))) {
                 $request->merge([
                     'sort_by' => 'date',
                     'sort' => -1,

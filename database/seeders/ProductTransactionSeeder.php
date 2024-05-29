@@ -105,7 +105,7 @@ class ProductTransactionSeeder extends Seeder
 
                     $date = $startOfMonth;
                     while ($date <= $endOfMonth) {
-                        if ($product->quantity <= 0){
+                        if ($product->quantity <= 0) {
                             break;
                         }
 
@@ -113,6 +113,7 @@ class ProductTransactionSeeder extends Seeder
                         Log::info('Random qty: '.$randomQty);
                         if ($randomQty == 0) {
                             $date = $date->addDay();
+
                             continue;
                         }
 
@@ -141,7 +142,7 @@ class ProductTransactionSeeder extends Seeder
                             'created_by' => 1,
                         ];
                         $transaction = Transaction::create($outTransaction);
-                        Log::info("created transaction: ".$transaction->id);
+                        Log::info('created transaction: '.$transaction->id);
                         $outTransaction['id'] = $transaction->id;
 
                         $item = [
@@ -160,10 +161,10 @@ class ProductTransactionSeeder extends Seeder
 
                         $product->quantity = $diffQuantity;
                         $product->save();
-                        Log::info("save product: ".$product->id." qty: ".$product->quantity);
-                        
+                        Log::info('save product: '.$product->id.' qty: '.$product->quantity);
+
                         $date = $date->addDay();
-                        Log::info("new date ".$date->format('Y-m-d'));
+                        Log::info('new date '.$date->format('Y-m-d'));
                     }
                 }
             }
@@ -175,7 +176,7 @@ class ProductTransactionSeeder extends Seeder
                 $date = $outTransaction['created_at'];
                 $dateFormat = $date->format('Y-m-d');
                 if (! isset($incomes[$dateFormat])) {
-                    Log::info("add income: ".$dateFormat);
+                    Log::info('add income: '.$dateFormat);
                     $incomes[$dateFormat] = [
                         'date' => $outTransaction['created_at'],
                         'total_item' => $outTransaction['total_item'],
@@ -186,7 +187,7 @@ class ProductTransactionSeeder extends Seeder
                         'created_by' => 1,
                     ];
                 } else {
-                    Log::info("update income: ".$dateFormat);
+                    Log::info('update income: '.$dateFormat);
                     $incomes[$dateFormat]['total_item'] += $outTransaction['total_item'];
                     $incomes[$dateFormat]['total_quantity'] += $outTransaction['total_quantity'];
                     $incomes[$dateFormat]['amount'] += $outTransaction['total_price'];

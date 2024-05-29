@@ -32,6 +32,16 @@ class PredictionController extends Controller
      *           description="Month",
      *           required=true,
      *       ),
+     *       @OA\Parameter(
+     *           name="limit",
+     *           in="query",
+     *           description="Limit (Default 10)"
+     *       ),
+     *       @OA\Parameter(
+     *           name="page",
+     *           in="query",
+     *           description="Num Of Page"
+     *       ),
      *
      *       @OA\Response(
      *          response=200,
@@ -39,9 +49,8 @@ class PredictionController extends Controller
      *
      *          @OA\JsonContent(
      *
-     *              @OA\Property(property="status", type="boolean", example=true),
-     *              @OA\Property(property="message", type="string", example="Get prediction value successfully"),
      *              @OA\Property(property="data", type="object", example={}),
+     *              @OA\Property(property="pagination", type="object", example={}),
      *          )
      *      ),
      *
@@ -60,7 +69,13 @@ class PredictionController extends Controller
     public function prediction(PredictionRequest $request)
     {
         $data = $request->validated();
-        $data = PredictionService::calculatePrediction($data['year'], $data['month']);
+        if (!isset($data['limit'])) {
+            $data['limit'] = 10;
+        }
+        if (!isset($data['page'])) {
+            $data['page'] = 1;
+        }
+        $data = PredictionService::calculatePrediction($data);
 
         return $this->responseJson(
             $data['status'] ? 'success' : 'error',
