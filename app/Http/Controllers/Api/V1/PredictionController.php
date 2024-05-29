@@ -69,10 +69,10 @@ class PredictionController extends Controller
     public function prediction(PredictionRequest $request)
     {
         $data = $request->validated();
-        if (!isset($data['limit'])) {
+        if (! isset($data['limit'])) {
             $data['limit'] = 10;
         }
-        if (!isset($data['page'])) {
+        if (! isset($data['page'])) {
             $data['page'] = 1;
         }
         $data = PredictionService::calculatePrediction($data);

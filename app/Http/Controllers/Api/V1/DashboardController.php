@@ -205,7 +205,7 @@ class DashboardController extends Controller
             'end_date' => $request->end_date ?? now()->format('Y-m-d'),
         ]);
 
-        $data = CategoryService::mostSold($request, $request->limit);
+        $data = CategoryService::mostSold($request);
 
         return $this->responseJson(
             $data['status'] ? 'success' : 'error',

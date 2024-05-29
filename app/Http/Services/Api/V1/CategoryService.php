@@ -2,6 +2,7 @@
 
 namespace App\Http\Services\Api\V1;
 
+use App\Enums\TransactionType;
 use App\Http\Filters\Api\V1\ByDescription;
 use App\Http\Filters\Api\V1\ByName;
 use App\Http\Filters\Api\V1\OrderBy;
@@ -119,44 +120,41 @@ class CategoryService extends BaseResponse
 
     public function mostSold($request)
     {
+        $startDatetime = date('Y-m-d 00:00:00', strtotime($request->start_date));
+        $endDatetime = date('Y-m-d 23:59:59', strtotime($request->end_date));
         try {
-            $categories = Category::with(['products.transactionItems'])
-                ->get()
-                ->map(function ($category) {
-                    $totalSold = 0;
-                    $category->products->each(function ($product) use (&$totalSold) {
-                        $product->transactionItems->each(function ($transactionItem) use (&$totalSold) {
-                            $totalSold += $transactionItem->quantity;
-                        });
-                    });
+            $query = DB::table('categories')
+                ->leftJoin('products', 'categories.id', '=', 'products.category_id')
+                ->leftJoin('transaction_items', 'products.id', '=', 'transaction_items.product_id')
+                ->leftJoin('transactions', 'transaction_items.transaction_id', '=', 'transactions.id')
+                ->select('categories.id', 'categories.name', 'categories.description', DB::raw('SUM(transaction_items.quantity) as total_sold'))
+                ->whereBetween('transactions.created_at', [$startDatetime, $endDatetime])
+                ->where('transactions.type', TransactionType::OUT->value)
+                ->groupBy('categories.id')
+                ->orderBy('total_sold', 'desc')
+                ->get();
 
-                    return [
-                        'id' => $category->id,
-                        'name' => $category->name,
-                        'description' => $category->description,
-                        'total_sold' => $totalSold,
-                    ];
-                })
-                ->sortByDesc('total_sold');
-
-            $totalAllSold = $categories->sum('total_sold');
-            $totalCategories = $categories->count();
+            $totalAllSold = 0;
+            foreach ($query as $item) {
+                $totalAllSold += $item->total_sold;
+            }
+            $totalCategories = count($query);
             $data = [
                 'total_categories' => $totalCategories,
                 'total_sold' => $totalAllSold,
                 'items' => [],
             ];
             // Mapping data items with the percentage of sold
-            $categories->each(function ($category) use ($totalAllSold, &$data) {
-                $percentage = $category['total_sold'] / $totalAllSold * 100;
+            foreach ($query as $item) {
+                $percentage = $item->total_sold / $totalAllSold * 100;
                 $data['items'][] = [
-                    'id' => $category['id'],
-                    'name' => $category['name'],
-                    'description' => $category['description'],
-                    'total_sold' => $category['total_sold'],
+                    'id' => $item->id,
+                    'name' => $item->name,
+                    'description' => $item->description,
+                    'total_sold' => intval($item->total_sold),
                     'percentage' => round($percentage, 2),
                 ];
-            });
+            }
 
             return $this->responseSuccess(__('Get most sold categories successfully'), 200, $data);
         } catch (\Throwable $th) {

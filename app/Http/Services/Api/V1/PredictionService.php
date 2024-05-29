@@ -191,7 +191,6 @@ class PredictionService extends BaseResponse
                 'limit' => $limit,
             ];
 
-
             $resp = [
                 'latest_timestamp' => date('Y-m-d', $latestTimestamp),
                 'first_timestamp' => date('Y-m-d', $firstTimestamp),
