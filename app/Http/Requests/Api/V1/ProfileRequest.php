@@ -16,6 +16,7 @@ class ProfileRequest extends FormRequest
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255', 'unique:users,email,'.auth()->id()],
             'phone_number' => ['nullable', 'string', 'max:255'],
+            'bio' => ['nullable', 'string', 'max:255'],
             'password' => ['nullable', Rules\Password::defaults()],
             'avatar' => ['nullable', 'image', 'mimes:'.getImageTypesValidation(), 'max:'.getMaxImageSize()],
         ];
