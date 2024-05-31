@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Middleware\Cors;
 use App\Http\Middleware\JsonHeaders;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -18,7 +17,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->group('api', [
             JsonHeaders::class,
-            Cors::class,
+            \Illuminate\Http\Middleware\HandleCors::class,
             // \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
             // 'throttle:api',
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
