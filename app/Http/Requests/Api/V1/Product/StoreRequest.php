@@ -22,12 +22,12 @@ class StoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'category_id' => ['required', 'integer', 'exists:categories,id'],
+            'category_id' => ['required', 'exists:categories,id'],
             'code' => ['required', 'unique:products', 'string', 'max:50'],
             'name' => ['required', 'string', 'max:100'],
             'description' => ['nullable', 'string', 'max:255'],
-            'price' => ['required', 'numeric'],
-            'quantity' => ['required', 'integer'],
+            'price' => ['required'],
+            'quantity' => ['required'],
             'image' => ['required', 'image', 'mimes:'.getImageTypesValidation(), 'max:'.getMaxImageSize()],
         ];
     }
