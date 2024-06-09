@@ -4,13 +4,11 @@ namespace Database\Seeders;
 
 use App\Enums\TransactionType;
 use App\Models\Expense;
-use App\Models\Income;
 use App\Models\Product;
 use App\Models\Transaction;
 use App\Models\TransactionItem;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 
 class ProductSeeder extends Seeder
 {
@@ -49,7 +47,7 @@ class ProductSeeder extends Seeder
                     $totalAmount += $product->price * $product->quantity;
 
                     $inTransaction = [
-                        'code' => $product->id . '-' . TransactionType::IN->value . '-' . now()->format('YmdHisu'),
+                        'code' => $product->id.'-'.TransactionType::IN->value.'-'.now()->format('YmdHisu'),
                         'type' => TransactionType::IN,
                         'total_item' => 1,
                         'total_quantity' => $product->quantity,

@@ -21,6 +21,7 @@ class TransactionItem extends Model
         'quantity',
         'total',
         'note',
+        'created_at',
     ];
 
     public function transaction(): BelongsTo

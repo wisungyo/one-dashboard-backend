@@ -2163,6 +2163,10 @@
                                         "type": "string",
                                         "example": "Buy some items"
                                     },
+                                    "created_at": {
+                                        "type": "string",
+                                        "example": "2024-04-04 15:30:30"
+                                    },
                                     "items": {
                                         "description": "Array of transaction items",
                                         "type": "array",

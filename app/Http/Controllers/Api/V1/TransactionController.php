@@ -169,6 +169,7 @@ class TransactionController extends Controller
      *              @OA\Property(property="customer_phone", type="string", example="08123456789"),
      *              @OA\Property(property="customer_address", type="string", example="Jl. Raya No. 1"),
      *              @OA\Property(property="note", type="string", example="Buy some items"),
+     *              @OA\Property(property="created_at", type="string", example="2024-04-04 15:30:30"),
      *              @OA\Property(
      *                  property="items",
      *                  type="array",
@@ -219,6 +220,7 @@ class TransactionController extends Controller
     {
         $data = $request->validated();
         $data['type'] = TransactionType::OUT;
+        $data['created_at'] = $data['created_at'] ?? now();
         $data = TransactionService::store($data);
 
         return $this->responseJson(

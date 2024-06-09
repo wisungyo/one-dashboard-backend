@@ -109,7 +109,7 @@ class TransactionService extends BaseResponse
                     'quantity' => $item['quantity'],
                     'total' => $product->price * $item['quantity'],
                     'note' => isset($item['note']) ? $item['note'] : null,
-                    'created_at' => now(),
+                    'created_at' => $data['created_at'] ?? now(),
                     'updated_at' => now(),
                 ];
             }

@@ -26,6 +26,7 @@ class StoreRequest extends FormRequest
             'customer_phone' => ['nullable', 'string'],
             'customer_address' => ['nullable', 'string'],
             'note' => ['nullable', 'string'],
+            'created_at' => ['nullable', 'date', 'date_format:Y-m-d H:i:s'],
 
             'items' => ['required', 'array'],
             'items.*.product_id' => ['required', 'integer', 'exists:products,id'],

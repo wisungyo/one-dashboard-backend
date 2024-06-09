@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Enums\TransactionType;
-use App\Models\Expense;
 use App\Models\Income;
 use App\Models\Product;
 use App\Models\Transaction;
@@ -46,7 +45,7 @@ class TransactionSeeder extends Seeder
                         }
 
                         $randomQty = random_int(0, 3);
-                        Log::info('Random qty: ' . $randomQty);
+                        Log::info('Random qty: '.$randomQty);
                         if ($randomQty == 0) {
                             $date = $date->addDay();
 
@@ -62,7 +61,7 @@ class TransactionSeeder extends Seeder
                         $totalPrice = $product->price * $quantity;
 
                         $outTransaction = [
-                            'code' => $product->id . '-' . TransactionType::OUT->value . '-' . now()->format('YmdHisu'),
+                            'code' => $product->id.'-'.TransactionType::OUT->value.'-'.now()->format('YmdHisu'),
                             'type' => TransactionType::OUT,
                             'total_item' => 1,
                             'total_quantity' => $quantity,
@@ -76,7 +75,7 @@ class TransactionSeeder extends Seeder
                             'created_by' => 1,
                         ];
                         $transaction = Transaction::create($outTransaction);
-                        Log::info('created transaction: ' . $transaction->id);
+                        Log::info('created transaction: '.$transaction->id);
                         $outTransaction['id'] = $transaction->id;
 
                         $item = [
@@ -95,22 +94,22 @@ class TransactionSeeder extends Seeder
 
                         $product->quantity = $diffQuantity;
                         $product->save();
-                        Log::info('save product: ' . $product->id . ' qty: ' . $product->quantity);
+                        Log::info('save product: '.$product->id.' qty: '.$product->quantity);
 
                         $date = $date->addDay();
-                        Log::info('new date ' . $date->format('Y-m-d'));
+                        Log::info('new date '.$date->format('Y-m-d'));
                     }
                 }
             }
 
-            Log::info('Out transactions len: ' . count($outTransactions));
+            Log::info('Out transactions len: '.count($outTransactions));
             TransactionItem::insert($outTransactionItems);
 
             foreach ($outTransactions as $outTransaction) {
                 $date = $outTransaction['created_at'];
                 $dateFormat = $date->format('Y-m-d');
-                if (!isset($incomes[$dateFormat])) {
-                    Log::info('add income: ' . $dateFormat);
+                if (! isset($incomes[$dateFormat])) {
+                    Log::info('add income: '.$dateFormat);
                     $incomes[$dateFormat] = [
                         'date' => $outTransaction['created_at'],
                         'total_item' => $outTransaction['total_item'],
@@ -121,13 +120,13 @@ class TransactionSeeder extends Seeder
                         'created_by' => 1,
                     ];
                 } else {
-                    Log::info('update income: ' . $dateFormat);
+                    Log::info('update income: '.$dateFormat);
                     $incomes[$dateFormat]['total_item'] += $outTransaction['total_item'];
                     $incomes[$dateFormat]['total_quantity'] += $outTransaction['total_quantity'];
                     $incomes[$dateFormat]['amount'] += $outTransaction['total_price'];
                 }
             }
-            Log::info('Incomes len: ' . count($incomes));
+            Log::info('Incomes len: '.count($incomes));
             Income::insert($incomes);
 
             DB::commit();

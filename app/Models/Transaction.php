@@ -27,6 +27,7 @@ class Transaction extends Model
         'customer_address',
         'note',
         'created_by',
+        'created_at',
     ];
 
     public function casts(): array
