@@ -27,7 +27,7 @@ class TransactionSeeder extends Seeder
             $outTransactionItems = [];
 
             // Add OUT transaction and the incomes
-            $products = Product::all();
+            $products = Product::where('quantity', '>', 0)->get();
 
             if ($products->isEmpty()) {
                 throw new \Exception('No product found');
