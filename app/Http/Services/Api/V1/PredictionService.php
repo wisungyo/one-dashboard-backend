@@ -169,15 +169,15 @@ class PredictionService extends BaseResponse
             // Get all product based on transaction items
             $productIds = array_unique(array_column($productsSummary, 'product_id'));
             $products = Product::with('category')->whereIn('id', $productIds)->get();
+            $productResources = [];
+
+            foreach ($products as $product) {
+                $productResources[$product->id] = new ProductResource($product);
+            }
 
             // Mapping product resource to product summary
             foreach ($productsSummary as $key => $productSummary) {
-                $index = $this->findIndex($products, function ($element) use ($productSummary) {
-                    return $element->id == $productSummary['product_id'];
-                });
-                if ($index != -1) {
-                    $productsSummary[$key]['product'] = new ProductResource($products[$index]);
-                }
+                $productsSummary[$key]['product'] = $productResources[$productSummary['product_id']] ?? null;
             }
 
             // Do pagination based on limit and page for the products summary

@@ -12,7 +12,7 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
-class ProductTransactionSeeder extends Seeder
+class TransactionSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -22,82 +22,18 @@ class ProductTransactionSeeder extends Seeder
         DB::beginTransaction();
         try {
             $totalMonth = 6;
-            $totalProducts = 20;
 
-            $expenses = [];
-            $inTransactions = [];
-            $inTransactionItems = [];
             $incomes = [];
             $outTransactions = [];
             $outTransactionItems = [];
 
-            // Add products, IN transactions and expense
-            foreach (range(1, $totalMonth) as $countMonth) {
-                $date = now()->subMonth($countMonth)->startOfMonth();
-
-                $products = Product::factory()->count($totalProducts)->create(
-                    [
-                        'created_at' => $date,
-                        'updated_at' => $date,
-                        'created_by' => 1,
-                    ]
-                );
-
-                $totalItem = 0;
-                $totalQuantity = 0;
-                $totalAmount = 0;
-                foreach ($products as $product) {
-                    $totalItem++;
-                    $totalQuantity += $product->quantity;
-                    $totalAmount += $product->price * $product->quantity;
-
-                    $inTransaction = [
-                        'code' => $product->id.'-'.TransactionType::IN->value.'-'.now()->format('YmdHisu'),
-                        'type' => TransactionType::IN,
-                        'total_item' => 1,
-                        'total_quantity' => $product->quantity,
-                        'total_price' => $product->price,
-                        'customer_name' => null,
-                        'customer_phone' => null,
-                        'customer_address' => null,
-                        'note' => null,
-                        'created_at' => $date,
-                        'updated_at' => $date,
-                        'created_by' => 1,
-                    ];
-                    $transaction = Transaction::create($inTransaction);
-                    $inTransaction['id'] = $transaction->id;
-
-                    $item = [
-                        'transaction_id' => $transaction->id,
-                        'product_id' => $product->id,
-                        'price' => $product->price,
-                        'quantity' => $product->quantity,
-                        'total' => $product->price * $product->quantity,
-                        'created_at' => $date,
-                        'updated_at' => $date,
-                    ];
-                    $inTransactionItems[] = $item;
-                    $inTransaction['items'][] = $item;
-
-                    $inTransactions[] = $inTransaction;
-                }
-
-                $expenses[] = [
-                    'date' => $date,
-                    'total_item' => $totalItem,
-                    'total_quantity' => $totalQuantity,
-                    'amount' => $totalAmount,
-                    'created_at' => $date,
-                    'updated_at' => $date,
-                    'created_by' => 1,
-                ];
-            }
-            TransactionItem::insert($inTransactionItems);
-            Expense::insert($expenses);
-
             // Add OUT transaction and the incomes
             $products = Product::all();
+
+            if ($products->isEmpty()) {
+                throw new \Exception('No product found');
+            }
+
             foreach ($products as $product) {
                 foreach (range(1, $totalMonth) as $countMonth) {
                     $startOfMonth = now()->subMonth($countMonth)->startOfMonth();
@@ -110,7 +46,7 @@ class ProductTransactionSeeder extends Seeder
                         }
 
                         $randomQty = random_int(0, 3);
-                        Log::info('Random qty: '.$randomQty);
+                        Log::info('Random qty: ' . $randomQty);
                         if ($randomQty == 0) {
                             $date = $date->addDay();
 
@@ -123,12 +59,10 @@ class ProductTransactionSeeder extends Seeder
                         }
 
                         $diffQuantity = $product->quantity - $quantity;
-                        $totalItem = 1;
-                        $totalQuantity = $quantity;
                         $totalPrice = $product->price * $quantity;
 
                         $outTransaction = [
-                            'code' => $product->id.'-'.TransactionType::OUT->value.'-'.now()->format('YmdHisu'),
+                            'code' => $product->id . '-' . TransactionType::OUT->value . '-' . now()->format('YmdHisu'),
                             'type' => TransactionType::OUT,
                             'total_item' => 1,
                             'total_quantity' => $quantity,
@@ -142,7 +76,7 @@ class ProductTransactionSeeder extends Seeder
                             'created_by' => 1,
                         ];
                         $transaction = Transaction::create($outTransaction);
-                        Log::info('created transaction: '.$transaction->id);
+                        Log::info('created transaction: ' . $transaction->id);
                         $outTransaction['id'] = $transaction->id;
 
                         $item = [
@@ -161,22 +95,22 @@ class ProductTransactionSeeder extends Seeder
 
                         $product->quantity = $diffQuantity;
                         $product->save();
-                        Log::info('save product: '.$product->id.' qty: '.$product->quantity);
+                        Log::info('save product: ' . $product->id . ' qty: ' . $product->quantity);
 
                         $date = $date->addDay();
-                        Log::info('new date '.$date->format('Y-m-d'));
+                        Log::info('new date ' . $date->format('Y-m-d'));
                     }
                 }
             }
 
-            Log::info('Out transactions len: '.count($outTransactions));
+            Log::info('Out transactions len: ' . count($outTransactions));
             TransactionItem::insert($outTransactionItems);
 
             foreach ($outTransactions as $outTransaction) {
                 $date = $outTransaction['created_at'];
                 $dateFormat = $date->format('Y-m-d');
-                if (! isset($incomes[$dateFormat])) {
-                    Log::info('add income: '.$dateFormat);
+                if (!isset($incomes[$dateFormat])) {
+                    Log::info('add income: ' . $dateFormat);
                     $incomes[$dateFormat] = [
                         'date' => $outTransaction['created_at'],
                         'total_item' => $outTransaction['total_item'],
@@ -187,13 +121,13 @@ class ProductTransactionSeeder extends Seeder
                         'created_by' => 1,
                     ];
                 } else {
-                    Log::info('update income: '.$dateFormat);
+                    Log::info('update income: ' . $dateFormat);
                     $incomes[$dateFormat]['total_item'] += $outTransaction['total_item'];
                     $incomes[$dateFormat]['total_quantity'] += $outTransaction['total_quantity'];
                     $incomes[$dateFormat]['amount'] += $outTransaction['total_price'];
                 }
             }
-            Log::info('Incomes len: '.count($incomes));
+            Log::info('Incomes len: ' . count($incomes));
             Income::insert($incomes);
 
             DB::commit();
