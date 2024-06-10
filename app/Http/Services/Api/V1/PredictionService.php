@@ -43,7 +43,7 @@ class PredictionService extends BaseResponse
             return $predictions;
         }
         $predictions[0] = $data[0];
-        $predictions[0][self::KEY_PREDICTION] = 0;
+        $predictions[0][self::KEY_PREDICTION] = intval($data[0][self::KEY_TOTAL]);
         for ($i = 1; $i < $n; $i++) {
             $predictions[$i] = $data[$i];
             $predictions[$i][self::KEY_PREDICTION] = $alpha * $data[$i][self::KEY_TOTAL] + (1 - $alpha) * $predictions[$i - 1][self::KEY_PREDICTION];
