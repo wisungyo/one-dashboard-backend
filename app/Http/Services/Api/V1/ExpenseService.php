@@ -73,7 +73,7 @@ class ExpenseService extends BaseResponse
             }
 
             $data = [
-                'date' => date('Y-m-d'),
+                'date' => $transaction->created_at->format('Y-m-d') ?? date('Y-m-d'),
                 'created_by' => auth()->id(),
             ];
             if ($type == ExpenseType::ADD) {
