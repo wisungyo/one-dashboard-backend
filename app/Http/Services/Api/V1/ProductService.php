@@ -13,6 +13,7 @@ use App\Http\Filters\Api\V1\ByQuantity;
 use App\Http\Filters\Api\V1\OrderBy;
 use App\Http\Resources\Api\V1\ProductResource;
 use App\Models\Product;
+use App\Models\TransactionItem;
 use Facades\App\Http\Services\Api\V1\ExpenseService;
 use Facades\App\Http\Services\Api\V1\TransactionService;
 use Illuminate\Http\Request;
@@ -220,25 +221,30 @@ class ProductService extends BaseResponse
     public function mostSold($request, $limit = 5)
     {
         try {
-            $products = Product::with(['transactionItems', 'transactionItems.transaction'])
-                ->whereHas('transactionItems', function ($query) use ($request) {
-                    $query->whereBetween('created_at', [$request->start_date, $request->end_date])->whereHas('transaction', function ($query) {
-                        $query->where('type', TransactionType::OUT);
-                    });
-                })
+            $transactionItems = TransactionItem::selectRaw('product_id, sum(quantity) as total_quantity, sum(total) as total_price')
+                ->leftJoin('transactions', 'transactions.id', '=', 'transaction_items.transaction_id')
+                ->where('transactions.type', TransactionType::OUT)
+                ->groupBy('product_id')
+                ->orderBy('total_quantity', 'desc')
+                ->limit($limit)
                 ->get()
-                ->sortByDesc(function ($product) {
-                    return $product->transactionItems->sum('quantity');
-                })
-                ->take($limit);
+                ->toArray();
+
+            // Get all product based on transaction items
+            $productIds = array_column($transactionItems, 'product_id');
+            $products = Product::with('category')->whereIn('id', $productIds)->get();
+            $productResources = [];
+
+            foreach ($products as $product) {
+                $productResources[$product->id] = new ProductResource($product);
+            }
 
             $data = [];
-            foreach ($products as $product) {
-                $quantity = $product->transactionItems->sum('quantity');
+            foreach ($transactionItems as $transactionItem) {
                 $data[] = [
-                    'product' => new ProductResource($product),
-                    'total_sold' => $quantity,
-                    'total_price' => $product->price * $quantity,
+                    'product' => $productResources[$transactionItem['product_id']] ?? null,
+                    'total_sold' => $transactionItem['total_quantity'],
+                    'total_price' => $transactionItem['total_price'],
                 ];
             }
 
